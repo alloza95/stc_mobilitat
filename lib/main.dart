@@ -4,12 +4,25 @@ import 'package:location/location.dart';
 
 void main() => runApp(MyApp());
 
-class MyApp extends StatefulWidget {
+/// Aquest és el widget principal de l'aplicació
+class MyApp extends StatelessWidget {
+  static const String _title = 'Flutter Code Sample';
+
   @override
-  _MyAppState createState() => _MyAppState();
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: _title,
+      home: MyMain(),
+    );
+  }
 }
 
-class _MyAppState extends State<MyApp> {
+class MyMain extends StatefulWidget {
+  @override
+  _MyMainState createState() => _MyMainState();
+}
+
+class _MyMainState extends State<MyMain> {
   
   final Location location = Location();
   GoogleMapController _mapController;
@@ -18,9 +31,9 @@ class _MyAppState extends State<MyApp> {
   LatLng _coordenades;
 
   @override
-  Widget build(BuildContext context) => MaterialApp(
-    home: Scaffold(
-      body: Stack(
+  Widget build(BuildContext context) => Scaffold(
+    body: Builder(
+      builder: (context) => Stack(
         children: <Widget>[
           GoogleMap(
             onMapCreated: (GoogleMapController controller){
@@ -41,7 +54,7 @@ class _MyAppState extends State<MyApp> {
               children: <Widget>[
                 Row(
                   children: <Widget>[
-                    _createButton(()=>{}, Icon(Icons.menu, size: 36.0, color: Colors.black,))
+                    _createButton(()=>{Scaffold.of(context).openDrawer()}, Icon(Icons.menu, size: 36.0, color: Colors.black,))
                   ],
                 ),
                 Row(
@@ -56,8 +69,9 @@ class _MyAppState extends State<MyApp> {
             ),
           )
         ],
-      )
+      ),
     ),
+    drawer: Drawer(),
   );
 
   //L'aplicació crida aquesta funció quan carrega main.dart
