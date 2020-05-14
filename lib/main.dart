@@ -3,6 +3,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 
 import 'my_drawer.dart';
+import 'screens/favorites_screen.dart';
 
 void main() => runApp(MyApp());
 
@@ -71,7 +72,7 @@ class _MyMainState extends State<MyMain> {
                       children: <Widget>[
                         //Boto per anar a la pantalla "parades preferides"
                         _createButton(
-                            () => {_pushFavorites()},
+                            () => {Favorites.pushFavorites(context)},
                             Icon(
                               Icons.star,
                               size: 36.0,
@@ -92,22 +93,8 @@ class _MyMainState extends State<MyMain> {
             ],
           ),
         ),
-        drawer: myDrawer(),
+        drawer: MyDrawer(),
       );
-
-  void _pushFavorites() {
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (BuildContext context) {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text('Parades preferides'),
-        ),
-        body: Center(
-          child: Text('hola'),
-        ),
-      );
-    }));
-  }
 
   //L'aplicació crida aquesta funció quan carrega main.dart
   @override
