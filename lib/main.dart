@@ -48,7 +48,8 @@ class _MyAppState extends State<MyApp> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
                     _createButton(()=>{}, Icon(Icons.star, size: 36.0, color: Colors.green,)),
-                    _createButton(()=>{}, Icon(Icons.my_location, size: 36.0, color: Colors.green,))
+                    //Botó per geolocalitzar l'usuari
+                    _createButton(()=>{_getLocation()}, Icon(Icons.my_location, size: 36.0, color: Colors.green,))
                   ],
                 )
               ],
