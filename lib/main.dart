@@ -34,6 +34,26 @@ class _MyAppState extends State<MyApp> {
             myLocationEnabled: true,
             myLocationButtonEnabled: false,
           ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(10, 30, 10, 30),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    _createButton(()=>{}, Icon(Icons.menu, size: 36.0, color: Colors.black,))
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    _createButton(()=>{}, Icon(Icons.star, size: 36.0, color: Colors.green,)),
+                    _createButton(()=>{}, Icon(Icons.my_location, size: 36.0, color: Colors.green,))
+                  ],
+                )
+              ],
+            ),
+          )
         ],
       )
     ),
@@ -79,5 +99,14 @@ class _MyAppState extends State<MyApp> {
         return;
       }
     }
+  }
+
+  //Funció per crear els FAB's de la pantalla main.dart
+  Widget _createButton(Function function, Icon icon){
+    return FloatingActionButton(
+      onPressed: function,
+      backgroundColor: Colors.white,
+      child: icon,
+    );
   }
 }
