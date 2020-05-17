@@ -100,6 +100,8 @@ class _HomeState extends State<Home> {
     super.initState();
   }
 
+
+  //TODO: Trobar la manera de posar els mètodes de localització en un altre axiu a part
   //Obté la posició de l'usuari i el converteix en el centre del mapa
   Future<void> _getLocation() async {
     if (_permissionGranted != PermissionStatus.granted) {

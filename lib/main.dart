@@ -22,6 +22,10 @@ class MyApp extends StatelessWidget {
         TitlesPrices.routeName: (BuildContext context) => TitlesPrices(),
         Service.routeName: (BuildContext context) => Service()
       },
+      theme: ThemeData(
+        primaryColor: Colors.white,
+        accentColor: Colors.green
+      ),
     );
   }
 }
