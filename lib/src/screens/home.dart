@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:stc_mobilitat_app/src/screens/favorites_screen.dart';
-import '../my_drawer.dart';
+import '../widgets/my_drawer.dart';
 import '../location.dart';
 
 class Home extends StatefulWidget {
@@ -101,7 +101,7 @@ class _HomeState extends State<Home> {
   }
 
 
-  //TODO: Trobar la manera de posar els mètodes de localització en un altre axiu a part
+  //TODO: Trobar la manera de posar els mètodes de localització en un altre arxiu a part
   //Obté la posició de l'usuari i el converteix en el centre del mapa
   Future<void> _getLocation() async {
     if (_permissionGranted != PermissionStatus.granted) {

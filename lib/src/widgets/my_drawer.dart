@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:stc_mobilitat_app/src/screens/favorites_screen.dart';
 import 'package:stc_mobilitat_app/src/screens/service_state_screen.dart';
 import 'package:stc_mobilitat_app/src/screens/titles_prices_screen.dart';
-import 'screens/lines_screen.dart';
+import '../screens/lines_screen.dart';
 
 Drawer getDrawer(BuildContext context) {
   DrawerHeader _header() {
