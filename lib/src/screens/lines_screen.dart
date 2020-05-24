@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stc_mobilitat_app/src/models/line.dart';
+import 'package:stc_mobilitat_app/src/repository/lines_respository.dart';
 import 'package:stc_mobilitat_app/src/widgets/line_item.dart';
 
 class Lines extends StatefulWidget {
@@ -10,7 +11,16 @@ class Lines extends StatefulWidget {
 }
 
 class _LinesState extends State<Lines> {
-  buildList(){
+
+  List<Line> _lines = <Line>[];
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    listenForLines();
+  }
+  /*buildList(){
     return <Line>[
       Line(1, 'L1', "MIRA-SOL-NUCLI - TORRENT DE FERRUSSONS", '#F70023', '#CCFFFF'),
       Line(2, 'L2A', "NUCLI - COLOMER - TURÓ DE CAN MATES", '#6735A1', '#CCFFFF'),
@@ -23,7 +33,7 @@ class _LinesState extends State<Lines> {
     return buildList()
     .map<LineItem>((line) => LineItem(line: line))
     .toList();
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -31,9 +41,18 @@ class _LinesState extends State<Lines> {
       appBar: AppBar(
         title: Text('Línies'),
       ),
-      body: ListView(
-        children: _buildContactList(),
+      body: ListView.builder(
+        itemCount: _lines.length,
+        itemBuilder: (context, index) => LineItem(line: _lines[index]),
       )
+      /*ListView(
+        children:_buildContactList(),
+      )*/
     );
+  }
+
+  void listenForLines() async{
+    final Stream<Line> stream = await getLines();
+    stream.listen((Line line) => setState(() => _lines.add(line)));
   }
 }
