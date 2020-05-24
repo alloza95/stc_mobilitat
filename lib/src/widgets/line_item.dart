@@ -36,6 +36,7 @@ class LineItem extends StatelessWidget {
           ),
         ),
         title: Text(line.description),
+        onTap: (){},
       ),
     );
   }

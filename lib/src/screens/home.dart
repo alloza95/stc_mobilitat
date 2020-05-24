@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:stc_mobilitat_app/src/screens/favorites_screen.dart';
-import 'my_drawer.dart';
-import 'location.dart';
+import '../my_drawer.dart';
+import '../location.dart';
 
 class Home extends StatefulWidget {
   @override

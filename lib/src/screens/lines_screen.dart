@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stc_mobilitat_app/src/models/line.dart';
-import 'package:stc_mobilitat_app/src/screens/line_item.dart';
+import 'package:stc_mobilitat_app/src/widgets/line_item.dart';
 
 class Lines extends StatefulWidget {
   static String routeName = '/lines';
