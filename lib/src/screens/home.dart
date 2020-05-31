@@ -93,10 +93,7 @@ class _HomeState extends State<Home> {
   //L'aplicació crida aquesta funció quan carrega main.dart
   @override
   void initState() {
-    // TODO: implement initState
-
     _getLocation();
-
     super.initState();
   }
 

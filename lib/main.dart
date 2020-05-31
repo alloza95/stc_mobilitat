@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:stc_mobilitat_app/src/screens/favorites_screen.dart';
 import 'package:stc_mobilitat_app/src/screens/lines_screen.dart';
+import 'package:stc_mobilitat_app/src/screens/route_line_screen.dart';
 import 'package:stc_mobilitat_app/src/screens/service_state_screen.dart';
 import 'package:stc_mobilitat_app/src/screens/titles_prices_screen.dart';
 import 'src/screens/home.dart';
@@ -20,7 +21,8 @@ class MyApp extends StatelessWidget {
         FavoritesList.routeName: (BuildContext context) => FavoritesList(),
         Lines.routeName: (BuildContext context) => Lines(),
         TitlesPrices.routeName: (BuildContext context) => TitlesPrices(),
-        Service.routeName: (BuildContext context) => Service()
+        Service.routeName: (BuildContext context) => Service(),
+        RouteLine.routeName: (BuildContext context) => RouteLine()
       },
       theme: ThemeData(
         primaryColor: Colors.white,

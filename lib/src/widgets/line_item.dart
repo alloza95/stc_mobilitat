@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stc_mobilitat_app/src/models/line.dart';
+import 'package:stc_mobilitat_app/src/screens/route_line_screen.dart';
 
 class HexColor extends Color {
   static int _getColorFromHex(String hexColor) {
@@ -31,12 +32,18 @@ class LineItem extends StatelessWidget {
           child: Center(
             child: Text(
               line.code,
-              style: TextStyle(color: HexColor(line.textColor), fontSize: 20, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                  color: HexColor(line.textColor),
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold),
             ),
           ),
         ),
         title: Text(line.description),
-        onTap: (){},
+        onTap: () {
+          print('apreto la línia ' + line.code);
+          Navigator.pushNamed(context, RouteLine.routeName);
+        },
       ),
     );
   }
