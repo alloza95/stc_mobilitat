@@ -42,7 +42,9 @@ class LineItem extends StatelessWidget {
         title: Text(line.description),
         onTap: () {
           print('apreto la línia ' + line.code);
-          Navigator.pushNamed(context, RouteLine.routeName);
+          // 4. Utilitzar la propietat arguments del mètode pushNamed de la classe Navigator
+          // per instar el constructor de RouteLine.
+          Navigator.pushNamed(context, RouteLine.routeName, arguments: RouteLine(codeLine: line.code));
         },
       ),
     );
