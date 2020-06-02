@@ -5,7 +5,8 @@ import 'package:stc_mobilitat_app/src/widgets/custom_tab_view.dart';
 
 class RouteScreen extends StatefulWidget {
   final String codeLine;
-  RouteScreen({this.codeLine});
+  final int idLine;
+  RouteScreen({this.codeLine, this.idLine});
 
   static String routeName = '/route';
   @override
@@ -28,7 +29,7 @@ class _RouteScreenState extends State<RouteScreen> {
         code = args.codeLine;
       });
       print('Estic al initState. Code: ' + args.codeLine);
-      Services.getRoutes().then((routes) {
+      Services.getRoutes(args.idLine.toString()).then((routes) {
         setState(() {
           _routes = routes;
         });
