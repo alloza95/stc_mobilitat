@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
         Lines.routeName: (BuildContext context) => Lines(),
         TitlesPrices.routeName: (BuildContext context) => TitlesPrices(),
         Service.routeName: (BuildContext context) => Service(),
-        RouteLine.routeName: (BuildContext context) => RouteLine()
+        RouteScreen.routeName: (BuildContext context) => RouteScreen()
       },
       theme: ThemeData(
         primaryColor: Colors.white,

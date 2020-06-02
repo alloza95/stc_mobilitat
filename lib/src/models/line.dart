@@ -5,9 +5,6 @@ class Line {
   String color; //Color de la línia
   String textColor; //Color del text
 
-  //Constructor
-  /*Line(this.id, this.code, this.description, this.color, this.textColor);*/
-
   Line.fromJSON(Map<String, dynamic> jsonMap) :
     id = jsonMap['ID_LINEA'],
     code = jsonMap['COD_LINEA'],
