@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
+import 'package:stc_mobilitat_app/src/models/bus_stop.dart';
 import 'package:stc_mobilitat_app/src/screens/favorites_screen.dart';
+import 'package:stc_mobilitat_app/src/services/fetch_database.dart';
 import '../widgets/my_drawer.dart';
 import '../location.dart';
 
@@ -16,6 +18,38 @@ class _HomeState extends State<Home> {
   PermissionStatus _permissionGranted;
   LocationData _locationData;
   LatLng _coordenades;
+  //Declarem una llista buida de Parades
+  List<BusStop> _parades = [];
+  //Declarem una llista buida de marcadors;
+  List<Marker> _allMarkers = [];  
+
+  //L'aplicació crida aquesta funció quan es crea l'estat
+  @override
+  void initState() {
+    super.initState();
+    Services.getBusStop().then((busStopList) {
+      //Omplim la nostre llista amb la resposta
+      _parades = busStopList;
+      //Actualitzem l'estat
+      setState(() {
+        for (var i = 0; i < _parades.length; i++) {
+          //Creem un marcador
+          final marker = Marker(
+            markerId: MarkerId(_parades[i].idParada.toString()),
+            position: LatLng(
+              _parades[i].parada.latitud,
+              _parades[i].parada.longitud
+            ),
+            infoWindow: InfoWindow(
+              title: _parades[i].parada.descParada)
+          );
+          //Afegim el marcador a la nostra llista de marcadors
+          _allMarkers.add(marker);
+        }
+        _getLocation();
+      });
+    });
+  }
 
   GoogleMap _googleMap() {
     return GoogleMap(
@@ -29,6 +63,7 @@ class _HomeState extends State<Home> {
       zoomControlsEnabled: false,
       myLocationEnabled: true,
       myLocationButtonEnabled: false,
+      markers: Set.from(_allMarkers),
     );
   }
 
@@ -89,13 +124,6 @@ class _HomeState extends State<Home> {
         ),
         drawer: getDrawer(context),
       );
-
-  //L'aplicació crida aquesta funció quan carrega main.dart
-  @override
-  void initState() {
-    _getLocation();
-    super.initState();
-  }
 
 
   //TODO: Trobar la manera de posar els mètodes de localització en un altre arxiu a part
