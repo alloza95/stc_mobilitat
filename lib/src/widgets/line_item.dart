@@ -31,7 +31,7 @@ class LineItem extends StatelessWidget {
               borderRadius: BorderRadius.all(Radius.circular(10))),
           child: Center(
             child: Text(
-              line.code,
+              line.codLinea,
               style: TextStyle(
                   color: HexColor(line.textColor),
                   fontSize: 20,
@@ -39,12 +39,12 @@ class LineItem extends StatelessWidget {
             ),
           ),
         ),
-        title: Text(line.description),
+        title: Text(line.descLinea),
         onTap: () {
-          print('apreto la línia ' + line.code);
+          print('apreto la línia ' + line.codLinea);
           // 4. Utilitzar la propietat arguments del mètode pushNamed de la classe Navigator
           // per instar el constructor de RouteLine.
-          Navigator.pushNamed(context, RouteScreen.routeName, arguments: RouteScreen(codeLine: line.code, idLine: line.id,));
+          Navigator.pushNamed(context, RouteScreen.routeName, arguments: RouteScreen(codeLine: line.codLinea, idLine: line.idLinea,));
         },
       ),
     );

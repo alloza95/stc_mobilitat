@@ -27,7 +27,7 @@ Drawer getDrawer(BuildContext context) {
   ListTile _getItem(IconData icon, String description, String route) {
     return ListTile(
       leading: Icon(icon),
-      title: Text(description),
+      title: Text(description, style: TextStyle(fontSize: 15),),
       onTap: () {
         Navigator.pushNamed(context, route);
       },
@@ -39,7 +39,7 @@ Drawer getDrawer(BuildContext context) {
       children: <Widget>[
         _header(),
         _getItem(Icons.star, 'Parades preferides', FavoritesList.routeName),
-        _getItem(Icons.business, 'Línies', Lines.routeName),
+        _getItem(Icons.business, 'Línies i parades', Lines.routeName),
         _getItem(
             Icons.attach_money, 'Títols i tarifes', TitlesPrices.routeName),
         _getItem(Icons.info, 'Estat del servei', Service.routeName),

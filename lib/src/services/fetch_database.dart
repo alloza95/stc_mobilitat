@@ -1,5 +1,6 @@
 import 'package:http/http.dart' as http;
 import 'package:stc_mobilitat_app/src/models/bus_stop.dart';
+import 'package:stc_mobilitat_app/src/models/line.dart';
 import 'package:stc_mobilitat_app/src/models/line_route.dart';
 
 class Services{
@@ -18,6 +19,23 @@ class Services{
       }
     } catch (e) {
       return List<BusStop>();
+    }
+  }
+
+  static Future<List<Line>> getLines() async {
+    
+    String url = 'https://santqbus.santcugat.cat/consultamv.php?q=GetListaLineas';
+
+    try {
+      final response = await http.get(url);
+      if (200 == response.statusCode) {
+        final List<Line> lines = lineFromJson(response.body);
+        return lines;
+      }else{
+        return List<Line>();
+      }
+    } catch (e) {
+      return List<Line>();
     }
   }
 

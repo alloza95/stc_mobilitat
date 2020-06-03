@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stc_mobilitat_app/src/models/line.dart';
-import 'package:stc_mobilitat_app/src/repository/lines_respository.dart';
+import 'package:stc_mobilitat_app/src/services/fetch_database.dart';
 import 'package:stc_mobilitat_app/src/widgets/line_item.dart';
 
 class Lines extends StatefulWidget {
@@ -16,7 +16,13 @@ class _LinesState extends State<Lines> {
   @override
   void initState() {
     super.initState();
-    listenForLines();
+    Services.getLines()
+      .then((lines) {
+        setState(() {
+          _lines = lines;
+        });
+      }
+    );
   }
 
   @override
@@ -32,10 +38,5 @@ class _LinesState extends State<Lines> {
           itemCount: _lines.length,
           itemBuilder: (context, index) => LineItem(line: _lines[index]),
         ));
-  }
-
-  void listenForLines() async {
-    final Stream<Line> stream = await getLines();
-    stream.listen((Line line) => setState(() => _lines.add(line)));
   }
 }
