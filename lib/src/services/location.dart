@@ -4,9 +4,13 @@ import 'package:location/location.dart';
 // Arquitectura BLOC
 
 class ServiceLocation {
+  //Iniciem el plugin Location
   Location location = Location();
+  //Declarem la variable que controla si l'usuari dona permís o no
   PermissionStatus permission;
+  //Declarem coordenades per defecte (el centre de la ciutat)
   LatLng coordenades = LatLng(41.472031, 2.086500);
+  //Declarem la variable que controla la visibilitat del punter blau de GoogleMaps
   bool locationEnabled;
 
   //Mètode per obtenir les coordenades del usuari
@@ -19,7 +23,6 @@ class ServiceLocation {
     if (permission == PermissionStatus.granted) {
       final _locationResult = await location.getLocation();
       coordenades = LatLng(_locationResult.latitude, _locationResult.longitude);
-      //LocationData locationData = _locationResult;
     }
     return coordenades;
   }

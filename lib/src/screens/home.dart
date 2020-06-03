@@ -16,7 +16,7 @@ class _HomeState extends State<Home> {
   List<BusStop> _parades = [];
   //Declarem una llista buida de marcadors
   List<Marker> _allMarkers = [];
-
+  //Declarem el controlador del mapa
   GoogleMapController _mapController;
 
   @override
@@ -42,7 +42,9 @@ class _HomeState extends State<Home> {
     });
   }
 
-  _getLocation() {
+  //Pregunta a l'usuari si dona permís per utilitzar l'ubicació,
+  //i en cas afirmatiu, el centra en el mapa.
+  void _getLocation() {
     bloc.getMyLocation().then((coordenades) {
       setState(() {
         _mapController.animateCamera(CameraUpdate.newCameraPosition(
@@ -51,7 +53,8 @@ class _HomeState extends State<Home> {
     });
   }
 
-  GoogleMap _googleMap() {    
+  //Retorna el mapa de GoogleMaps
+  GoogleMap _googleMap() {
     return GoogleMap(
       onMapCreated: (GoogleMapController controller) {
         _mapController = controller;
@@ -67,71 +70,79 @@ class _HomeState extends State<Home> {
     );
   }
 
+  //Retorna els 3 botons
+  Widget _botons(BuildContext _context) {
+    double sizeButton = 36.0;
+    //
+    return Padding(
+      padding: EdgeInsets.fromLTRB(10, 30, 10, 30),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              //Botó per obrir el menú de navegació
+              Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.black, width: 1),
+                  shape: BoxShape.circle
+                ),
+                child: FloatingActionButton(
+                  onPressed: () => Scaffold.of(_context).openDrawer(),
+                  backgroundColor: Colors.white,
+                  child: Icon(Icons.menu, size: sizeButton, color: Colors.black),
+                  heroTag: 'menu',
+                ),
+              )
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              //Botó per anar a la pantalla "parades preferides"
+              Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.green, width: 1),
+                  shape: BoxShape.circle
+                ),
+                child: FloatingActionButton(
+                  onPressed: () => Navigator.pushNamed(context, FavoritesList.routeName),
+                  backgroundColor: Colors.white,
+                  child: Icon(Icons.star, size: sizeButton, color: Colors.green),
+                  heroTag: 'favorites',
+                ),
+              ),
+              //Botó per geolocalitzar l'usuari
+              Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.green, width: 1),
+                  shape: BoxShape.circle
+                ),
+                child: FloatingActionButton(
+                  onPressed: () => {_getLocation()},
+                  backgroundColor: Colors.white,
+                  child: Icon(Icons.my_location, size: sizeButton, color: Colors.green),
+                  heroTag: 'location',
+                ),
+              )
+            ],
+          )
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Builder(
         builder: (context) => Stack(
           children: <Widget>[
-            _googleMap(),
-            Padding(
-              padding: EdgeInsets.fromLTRB(10, 30, 10, 30),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Row(
-                    children: <Widget>[
-                      //Botó per obrir el menú de navegació
-                      _createButton(
-                          () => {Scaffold.of(context).openDrawer()},
-                          Icon(
-                            Icons.menu,
-                            size: 36.0,
-                            color: Colors.black,
-                          ),
-                          "menu")
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      //Botó per anar a la pantalla "parades preferides"
-                      _createButton(
-                          () => {
-                                Navigator.pushNamed(
-                                    context, FavoritesList.routeName)
-                              },
-                          Icon(
-                            Icons.star,
-                            size: 36.0,
-                            color: Colors.green,
-                          ),
-                          "favorites"),
-                      //Botó per geolocalitzar l'usuari
-                      _createButton(
-                          () => {_getLocation()},
-                          Icon(Icons.my_location,
-                              size: 36.0, color: Colors.green),
-                          "location")
-                    ],
-                  )
-                ],
-              ),
-            )
-          ],
+            _googleMap(), 
+            _botons(context)],
         ),
       ),
       drawer: getDrawer(context),
-    );
-  }
-
-  //Funció per crear els FAB's de la pantalla main.dart
-  Widget _createButton(Function function, Icon icon, String tag) {
-    return FloatingActionButton(
-      onPressed: function,
-      backgroundColor: Colors.white,
-      child: icon,
-      heroTag: tag,
     );
   }
 }
