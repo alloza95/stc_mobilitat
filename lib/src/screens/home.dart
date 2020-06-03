@@ -19,9 +19,28 @@ class _HomeState extends State<Home> {
   //Declarem el controlador del mapa
   GoogleMapController _mapController;
 
+  BitmapDescriptor defaultMarkerIcon;
+  BitmapDescriptor selectedMarkerIcon;
+
+  int markerFlag;
+
   @override
   void initState() {
     super.initState();
+
+    //
+    BitmapDescriptor.fromAssetImage(
+        ImageConfiguration(size: Size(40, 40)), 'assets/default_busStop_icon.png')
+        .then((onValue) {
+      defaultMarkerIcon = onValue;
+    });
+    BitmapDescriptor.fromAssetImage(
+        ImageConfiguration(size: Size(40, 40)), 'assets/selectedBusStop.png')
+        .then((onValue) {
+      selectedMarkerIcon = onValue;
+    });
+    //
+
     Services.getBusStop().then((busStopList) {
       //Omplim la nostre llista amb la resposta
       _parades = busStopList;
@@ -33,7 +52,20 @@ class _HomeState extends State<Home> {
               markerId: MarkerId(_parades[i].idParada.toString()),
               position: LatLng(
                   _parades[i].parada.latitud, _parades[i].parada.longitud),
-              infoWindow: InfoWindow(title: _parades[i].parada.descParada));
+              infoWindow: InfoWindow(title: _parades[i].parada.descParada),
+              icon: defaultMarkerIcon,
+              onTap: () {
+                if (markerFlag != i) {                  
+                  setState(() {
+                    if (markerFlag != null) {
+                      _allMarkers[markerFlag] = _allMarkers[markerFlag].copyWith(iconParam: defaultMarkerIcon);
+                    }
+                   _allMarkers[i] = _allMarkers[i].copyWith(iconParam: selectedMarkerIcon);
+                   markerFlag = i;
+                  });                
+                }
+              },
+          );
           //Afegim el marcador a la nostra llista de marcadors
           _allMarkers.add(marker);
         }
@@ -63,10 +95,19 @@ class _HomeState extends State<Home> {
         target: bloc.coordenades,
         zoom: 14.5,
       ),
+      mapToolbarEnabled: false,
       zoomControlsEnabled: false,
       myLocationEnabled: bloc.locationEnabled,
       myLocationButtonEnabled: false,
       markers: Set.from(_allMarkers),
+      onTap: (value){
+        if (markerFlag != null) {
+          setState(() {
+            _allMarkers[markerFlag] = _allMarkers[markerFlag].copyWith(iconParam: defaultMarkerIcon);
+            markerFlag = null;
+          });
+        }
+      },
     );
   }
 
