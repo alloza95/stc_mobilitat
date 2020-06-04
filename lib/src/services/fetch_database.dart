@@ -30,6 +30,14 @@ class Services{
       final response = await http.get(url);
       if (200 == response.statusCode) {
         final List<Line> lines = lineFromJson(response.body);
+        for (var i = 0; i < lines.length; i++) {
+          String codLinea = lines[i].codLinea;
+          codLinea = codLinea.replaceAll(' ', '');
+          if(codLinea.startsWith('Línia')){
+            codLinea = codLinea.substring(5);
+          }
+          lines[i].codLinea = codLinea;
+        }
         return lines;
       }else{
         return List<Line>();
