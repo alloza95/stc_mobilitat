@@ -42,7 +42,7 @@ class _RouteScreenState extends State<RouteScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(args.codeLine),
+        title: Text(code),
       ),
       body: CustomTabView(
         itemCount: _routes.length,
