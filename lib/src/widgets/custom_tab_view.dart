@@ -62,9 +62,13 @@ class _CustomTabViewState extends State<CustomTabView>
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).primaryColor,
+          ),
           alignment: Alignment.center,
           child: TabBar(
             controller: _controller,
+            isScrollable: true,
             labelColor: Theme.of(context).accentColor,
             unselectedLabelColor: Theme.of(context).hintColor,
             indicator: BoxDecoration(

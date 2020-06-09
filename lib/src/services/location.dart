@@ -1,8 +1,6 @@
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 
-// Arquitectura BLOC
-
 class ServiceLocation {
   //Iniciem el plugin Location
   Location location = Location();
@@ -40,7 +38,7 @@ class ServiceLocation {
   }
 }
 
-// Arquitectura BLOC. Instanciar la classe fora de qualsevol
+// Instanciar la classe fora de qualsevol
 // mètode o classe ens permet accedir a les dades desde
 // tot el projecte.
 var bloc = ServiceLocation();

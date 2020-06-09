@@ -24,18 +24,23 @@ class _HomeState extends State<Home> {
 
   int markerFlag;
 
+  double sizeButton = 36.0;
+
+  final _scaffoldKey = new GlobalKey<ScaffoldState>();
+  Function _showBottomSheetCallBack;
+
   @override
   void initState() {
     super.initState();
-
+    _showBottomSheetCallBack = _showBottomSheet;
     //
-    BitmapDescriptor.fromAssetImage(
-        ImageConfiguration(size: Size(40, 40)), 'assets/default_busStop_icon.png')
+    BitmapDescriptor.fromAssetImage(ImageConfiguration(size: Size(40, 40)),
+            'assets/default_busStop_icon.png')
         .then((onValue) {
       defaultMarkerIcon = onValue;
     });
-    BitmapDescriptor.fromAssetImage(
-        ImageConfiguration(size: Size(40, 40)), 'assets/selectedBusStop.png')
+    BitmapDescriptor.fromAssetImage(ImageConfiguration(size: Size(40, 40)),
+            'assets/selectedBusStop.png')
         .then((onValue) {
       selectedMarkerIcon = onValue;
     });
@@ -49,22 +54,25 @@ class _HomeState extends State<Home> {
         for (var i = 0; i < _parades.length; i++) {
           //Creem un marcador
           final marker = Marker(
-              markerId: MarkerId(_parades[i].idParada.toString()),
-              position: LatLng(
-                  _parades[i].parada.latitud, _parades[i].parada.longitud),
-              infoWindow: InfoWindow(title: _parades[i].parada.descParada),
-              icon: defaultMarkerIcon,
-              onTap: () {
-                if (markerFlag != i) {                  
-                  setState(() {
-                    if (markerFlag != null) {
-                      _allMarkers[markerFlag] = _allMarkers[markerFlag].copyWith(iconParam: defaultMarkerIcon);
-                    }
-                   _allMarkers[i] = _allMarkers[i].copyWith(iconParam: selectedMarkerIcon);
-                   markerFlag = i;
-                  });                
-                }
-              },
+            markerId: MarkerId(_parades[i].idParada.toString()),
+            position:
+                LatLng(_parades[i].parada.latitud, _parades[i].parada.longitud),
+            infoWindow: InfoWindow(title: _parades[i].parada.descParada),
+            icon: defaultMarkerIcon,
+            onTap: () {
+              if (markerFlag != i) {
+                setState(() {
+                  if (markerFlag != null) {
+                    _allMarkers[markerFlag] = _allMarkers[markerFlag]
+                        .copyWith(iconParam: defaultMarkerIcon);
+                  }
+                  _allMarkers[i] =
+                      _allMarkers[i].copyWith(iconParam: selectedMarkerIcon);
+                  markerFlag = i;
+                });
+                _showBottomSheetCallBack(_parades[i]);
+              }
+            },
           );
           //Afegim el marcador a la nostra llista de marcadors
           _allMarkers.add(marker);
@@ -85,6 +93,31 @@ class _HomeState extends State<Home> {
     });
   }
 
+  void _showBottomSheet(BusStop parada) {
+    /*setState(() {
+     _showBottomSheetCallBack = null; 
+    });
+    */
+    _scaffoldKey.currentState.showBottomSheet((context) {
+      return new Container(
+        height: 300,
+        color: Colors.red,
+        child: Center(
+          child: Text(parada.parada.descParada),
+        ),
+      );
+    })
+        /*.closed
+    .whenComplete((){
+      if(mounted){
+        setState(() {
+         _showBottomSheetCallBack = _showBottomSheet; 
+        });
+      }
+    })*/
+        ;
+  }
+
   //Retorna el mapa de GoogleMaps
   GoogleMap _googleMap() {
     return GoogleMap(
@@ -100,10 +133,11 @@ class _HomeState extends State<Home> {
       myLocationEnabled: bloc.locationEnabled,
       myLocationButtonEnabled: false,
       markers: Set.from(_allMarkers),
-      onTap: (value){
+      onTap: (value) {
         if (markerFlag != null) {
           setState(() {
-            _allMarkers[markerFlag] = _allMarkers[markerFlag].copyWith(iconParam: defaultMarkerIcon);
+            _allMarkers[markerFlag] =
+                _allMarkers[markerFlag].copyWith(iconParam: defaultMarkerIcon);
             markerFlag = null;
           });
         }
@@ -113,60 +147,23 @@ class _HomeState extends State<Home> {
 
   //Retorna els 3 botons
   Widget _botons(BuildContext _context) {
-    double sizeButton = 36.0;
     //
     return Padding(
-      padding: EdgeInsets.fromLTRB(10, 30, 10, 30),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      padding: const EdgeInsets.all(12),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
-          Row(
-            children: <Widget>[
-              //Botó per obrir el menú de navegació
-              Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.black, width: 1),
-                  shape: BoxShape.circle
-                ),
-                child: FloatingActionButton(
-                  onPressed: () => Scaffold.of(_context).openDrawer(),
-                  backgroundColor: Colors.white,
-                  child: Icon(Icons.menu, size: sizeButton, color: Colors.black),
-                  heroTag: 'menu',
-                ),
-              )
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              //Botó per anar a la pantalla "parades preferides"
-              Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.green, width: 1),
-                  shape: BoxShape.circle
-                ),
-                child: FloatingActionButton(
-                  onPressed: () => Navigator.pushNamed(context, FavoritesList.routeName),
-                  backgroundColor: Colors.white,
-                  child: Icon(Icons.star, size: sizeButton, color: Colors.green),
-                  heroTag: 'favorites',
-                ),
-              ),
-              //Botó per geolocalitzar l'usuari
-              Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.green, width: 1),
-                  shape: BoxShape.circle
-                ),
-                child: FloatingActionButton(
-                  onPressed: () => {_getLocation()},
-                  backgroundColor: Colors.white,
-                  child: Icon(Icons.my_location, size: sizeButton, color: Colors.green),
-                  heroTag: 'location',
-                ),
-              )
-            ],
+          //Botó per obrir el menú de navegació
+          Container(
+            decoration: BoxDecoration(
+                border: Border.all(color: Colors.black, width: 1),
+                shape: BoxShape.circle),
+            child: FloatingActionButton(
+              onPressed: () => Scaffold.of(_context).openDrawer(),
+              backgroundColor: Colors.white,
+              child: Icon(Icons.menu, size: sizeButton, color: Colors.black),
+              heroTag: 'menu',
+            ),
           )
         ],
       ),
@@ -176,14 +173,53 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       body: Builder(
         builder: (context) => Stack(
           children: <Widget>[
             _googleMap(), 
-            _botons(context)],
+            SafeArea(
+              child: _botons(context)
+            )
+          ],
         ),
       ),
       drawer: getDrawer(context),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            //Botó per anar a la pantalla "parades preferides"
+            Container(
+              decoration: BoxDecoration(
+                  border: Border.all(color: Colors.green, width: 1),
+                  shape: BoxShape.circle),
+              child: FloatingActionButton(
+                onPressed: () =>
+                    Navigator.pushNamed(context, FavoritesList.routeName),
+                backgroundColor: Colors.white,
+                child: Icon(Icons.star, size: sizeButton, color: Colors.green),
+                heroTag: 'favorites',
+              ),
+            ),
+            //Botó per geolocalitzar l'usuari
+            Container(
+              decoration: BoxDecoration(
+                  border: Border.all(color: Colors.green, width: 1),
+                  shape: BoxShape.circle),
+              child: FloatingActionButton(
+                onPressed: () => {_getLocation()},
+                backgroundColor: Colors.white,
+                child: Icon(Icons.my_location,
+                    size: sizeButton, color: Colors.green),
+                heroTag: 'location',
+              ),
+            )
+          ],
+        ),
+      ),
     );
   }
 }
