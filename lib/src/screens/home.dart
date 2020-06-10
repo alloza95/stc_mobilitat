@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:stc_mobilitat_app/src/models/bus_stop.dart';
 import 'package:stc_mobilitat_app/src/screens/favorites_screen.dart';
+import 'package:stc_mobilitat_app/src/services/favoriteList.dart';
 import 'package:stc_mobilitat_app/src/services/fetch_database.dart';
 import '../widgets/my_drawer.dart';
 import '../services/location.dart';
@@ -34,6 +35,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
 
   //
   String currentDescParada = '';
+  Icon _favoriteIcon = Icon(Icons.star_border);
+  int favoritesListFlag;
   //
   @override
   void initState() {
@@ -282,8 +285,20 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                   ),
                 ),
                 IconButton(
-                  icon: Icon(Icons.star_border),
-                  onPressed: () {},
+                  icon: _favoriteIcon,
+                  onPressed: () {
+                    if(_isFavorite(_parades[markerFlag].parada)){
+                      favoritesList.removeAt(favoritesListFlag);
+                      setState(() {
+                       _favoriteIcon = Icon(Icons.star_border); 
+                      });
+                    }else{
+                      favoritesList.add(_parades[markerFlag].parada);
+                      setState(() {
+                       _favoriteIcon = Icon(Icons.star); 
+                      });
+                    }                    
+                  },
                 ),
               ],
             ),
@@ -293,7 +308,31 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     );
   }
 
+  bool _isFavorite(ParadaClass currentParada){
+    bool finalResult = false;
+    for (var i = 0; i < favoritesList.length; i++) {
+      if (currentParada.idParada == favoritesList[i].idParada) {
+        finalResult = true;
+        favoritesListFlag = i;
+      } else {
+        finalResult = false;
+      }
+    }
+    return finalResult;
+  }
+
   void updatePanel(BusStop busStop) {
     currentDescParada = busStop.parada.descParada;
+    if (_isFavorite(busStop.parada)) {
+      setState(() {
+       print('actualitzo el la icona a favorita');
+       _favoriteIcon = Icon(Icons.star); 
+      });
+    }else{
+      setState(() {
+       print('actualitzo la icona a no favorita');
+       _favoriteIcon = Icon(Icons.star_border); 
+      });
+    }
   }
 }
