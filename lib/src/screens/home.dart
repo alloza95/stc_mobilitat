@@ -11,7 +11,7 @@ class Home extends StatefulWidget {
   _HomeState createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> {
+class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   //Declarem una llista buida de parades
   List<BusStop> _parades = [];
   //Declarem una llista buida de marcadors
@@ -24,15 +24,22 @@ class _HomeState extends State<Home> {
 
   int markerFlag;
 
+  double heightScreen;
+  double heightFab = 0;
+  AnimationController _animationController;
+  Tween<Offset> _tween = Tween(begin: Offset(0, 1), end: Offset(0, 0));
+  final _draggableKey = GlobalKey();
+  BuildContext _draggableContext;
+
   double sizeButton = 36.0;
 
   final _scaffoldKey = new GlobalKey<ScaffoldState>();
-  Function _showBottomSheetCallBack;
 
   @override
   void initState() {
     super.initState();
-    _showBottomSheetCallBack = _showBottomSheet;
+    _animationController =
+        AnimationController(vsync: this, duration: Duration(milliseconds: 500));
     //
     BitmapDescriptor.fromAssetImage(ImageConfiguration(size: Size(40, 40)),
             'assets/default_busStop_icon.png')
@@ -59,7 +66,7 @@ class _HomeState extends State<Home> {
                 LatLng(_parades[i].parada.latitud, _parades[i].parada.longitud),
             infoWindow: InfoWindow(title: _parades[i].parada.descParada),
             icon: defaultMarkerIcon,
-            onTap: () {
+            onTap: (){
               if (markerFlag != i) {
                 setState(() {
                   if (markerFlag != null) {
@@ -70,8 +77,14 @@ class _HomeState extends State<Home> {
                       _allMarkers[i].copyWith(iconParam: selectedMarkerIcon);
                   markerFlag = i;
                 });
-                _showBottomSheetCallBack(_parades[i]);
               }
+
+              //TEST
+              _animationController.reset();
+              DraggableScrollableActuator.reset(_draggableContext);
+              _animationController.forward();
+              //TEST
+              
             },
           );
           //Afegim el marcador a la nostra llista de marcadors
@@ -91,31 +104,6 @@ class _HomeState extends State<Home> {
             CameraPosition(target: coordenades, zoom: 16.8)));
       });
     });
-  }
-
-  void _showBottomSheet(BusStop parada) {
-    /*setState(() {
-     _showBottomSheetCallBack = null; 
-    });
-    */
-    _scaffoldKey.currentState.showBottomSheet((context) {
-      return new Container(
-        height: 300,
-        color: Colors.red,
-        child: Center(
-          child: Text(parada.parada.descParada),
-        ),
-      );
-    })
-        /*.closed
-    .whenComplete((){
-      if(mounted){
-        setState(() {
-         _showBottomSheetCallBack = _showBottomSheet; 
-        });
-      }
-    })*/
-        ;
   }
 
   //Retorna el mapa de GoogleMaps
@@ -164,7 +152,20 @@ class _HomeState extends State<Home> {
               child: Icon(Icons.menu, size: sizeButton, color: Colors.black),
               heroTag: 'menu',
             ),
+          ),
+
+          //TEST
+          FloatingActionButton(
+            onPressed: () {
+              _animationController.reset();
+              DraggableScrollableActuator.reset(_draggableContext);
+              _animationController.forward();
+              print('SOC EL CONTEXT DESDE EL BOTO ' +
+                  _draggableContext.toString());
+            },
           )
+          //TEST
+
         ],
       ),
     );
@@ -172,53 +173,98 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    heightScreen = MediaQuery.of(context).size.height;
+    print('hola soc el height ' + heightScreen.toString());
     return Scaffold(
       key: _scaffoldKey,
       body: Builder(
         builder: (context) => Stack(
           children: <Widget>[
-            _googleMap(), 
-            SafeArea(
-              child: _botons(context)
+            _googleMap(),
+            SafeArea(child: _botons(context)),
+            SlideTransition(
+              position: _tween.animate(_animationController),
+              child: NotificationListener<DraggableScrollableNotification>(
+                child: DraggableScrollableActuator(
+                  child: DraggableScrollableSheet(
+                    builder: (BuildContext draggableContext,
+                        ScrollController controller) {
+                      _draggableContext = draggableContext;
+                      return SingleChildScrollView(
+                        controller: controller,
+                        child: Container(
+                          color: Colors.red,
+                          height: 300,
+                        ),
+                      );
+                    },
+                    initialChildSize: 0.25,
+                    maxChildSize: 1,
+                    minChildSize: 0.05,
+                    expand: true,
+                  ),
+                ),
+                onNotification: (notificacion) {                  
+                  double heightSheet = notificacion.extent;
+                  setState(() {
+                    heightFab = heightScreen * heightSheet;
+                    if (heightSheet == 0.05) {
+                      print(notificacion.extent);
+                      _animationController.reverse();
+                      _animationController.reset();
+                      DraggableScrollableActuator.reset(_draggableContext);
+                    }
+                  });
+                  return true;
+                },
+              ),
             )
           ],
         ),
       ),
       drawer: getDrawer(context),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            //Botó per anar a la pantalla "parades preferides"
-            Container(
-              decoration: BoxDecoration(
-                  border: Border.all(color: Colors.green, width: 1),
-                  shape: BoxShape.circle),
-              child: FloatingActionButton(
-                onPressed: () =>
-                    Navigator.pushNamed(context, FavoritesList.routeName),
-                backgroundColor: Colors.white,
-                child: Icon(Icons.star, size: sizeButton, color: Colors.green),
-                heroTag: 'favorites',
-              ),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                //Botó per anar a la pantalla "parades preferides"
+                Container(
+                  margin: EdgeInsets.only(bottom: heightFab),
+                  decoration: BoxDecoration(
+                      border: Border.all(color: Colors.green, width: 1),
+                      shape: BoxShape.circle),
+                  child: FloatingActionButton(
+                    onPressed: () =>
+                        Navigator.pushNamed(context, FavoritesList.routeName),
+                    backgroundColor: Colors.white,
+                    child:
+                        Icon(Icons.star, size: sizeButton, color: Colors.green),
+                    heroTag: 'favorites',
+                  ),
+                ),
+                //Botó per geolocalitzar l'usuari
+                Container(
+                  margin: EdgeInsets.only(bottom: heightFab),
+                  decoration: BoxDecoration(
+                      border: Border.all(color: Colors.green, width: 1),
+                      shape: BoxShape.circle),
+                  child: FloatingActionButton(
+                    onPressed: () => {_getLocation()},
+                    backgroundColor: Colors.white,
+                    child: Icon(Icons.my_location,
+                        size: sizeButton, color: Colors.green),
+                    heroTag: 'location',
+                  ),
+                )
+              ],
             ),
-            //Botó per geolocalitzar l'usuari
-            Container(
-              decoration: BoxDecoration(
-                  border: Border.all(color: Colors.green, width: 1),
-                  shape: BoxShape.circle),
-              child: FloatingActionButton(
-                onPressed: () => {_getLocation()},
-                backgroundColor: Colors.white,
-                child: Icon(Icons.my_location,
-                    size: sizeButton, color: Colors.green),
-                heroTag: 'location',
-              ),
-            )
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
