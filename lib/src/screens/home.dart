@@ -28,10 +28,13 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   double heightScreen;
   //Bandera que controla el marge inferior que han
   //de tenir els dos botons inferiors
-  double marginBottomFab = 0;  
+  double marginBottomFab = 0;
   //Declarem el controlador del panell
   PanelController _panelController;
 
+  //
+  String currentDescParada = '';
+  //
   @override
   void initState() {
     super.initState();
@@ -62,16 +65,18 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             markerId: MarkerId(_parades[i].idParada.toString()),
             position:
                 LatLng(_parades[i].parada.latitud, _parades[i].parada.longitud),
-            infoWindow: InfoWindow(title: _parades[i].parada.descParada),
+            //infoWindow: InfoWindow(title: _parades[i].parada.descParada),
             icon: defaultMarkerIcon,
-            onTap: (){
+            onTap: () {
               //Comportament del panell
               if (_panelController.isPanelClosed != true) {
-                _panelController.close().whenComplete((){
-                  _panelController.animatePanelToSnapPoint();
+                _panelController.close().whenComplete(() {
+                  updatePanel(_parades[i]);
+                  _panelController.animatePanelToPosition(0.25);
                 });
               } else {
-                _panelController.animatePanelToSnapPoint();
+                updatePanel(_parades[i]);
+                _panelController.animatePanelToPosition(0.25);
               }
               //Canvi d'icona
               if (markerFlag != i) {
@@ -153,7 +158,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                 child: FloatingActionButton(
                   onPressed: () => Scaffold.of(_context).openDrawer(),
                   backgroundColor: Colors.white,
-                  child: Icon(Icons.menu, size: sizeButton, color: Colors.black),
+                  child:
+                      Icon(Icons.menu, size: sizeButton, color: Colors.black),
                   heroTag: 'menu',
                 ),
               ),
@@ -213,22 +219,81 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             ],
           ),
         ),
-        panel: Center(
-          child: Text('Hola que tal'),
-        ),
+        panel: _panel(),
         controller: _panelController,
         minHeight: 0,
         maxHeight: heightScreen,
         snapPoint: 0.5,
-        onPanelSlide: (position){
+        borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(32), topRight: Radius.circular(32)),
+        onPanelSlide: (position) {
           if (position <= 0.5) {
             setState(() {
-              marginBottomFab = heightScreen * position; 
+              marginBottomFab = heightScreen * position;
             });
-          }          
+          }
         },
       ),
       drawer: getDrawer(context),
     );
+  }
+
+  Widget _panel() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: <Widget>[
+        //Header
+        Container(
+          height: heightScreen * 0.25,
+          width: double.maxFinite,
+          decoration: BoxDecoration(
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 3,
+                    spreadRadius: 1,
+                    offset: Offset(0, 3))
+              ],
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(32), topRight: Radius.circular(32))),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  margin: EdgeInsets.only(bottom: 16),
+                  height: 4,
+                  width: 64,
+                  decoration: BoxDecoration(
+                    color: Colors.black12,
+                    borderRadius: BorderRadius.all(Radius.circular(4)),
+                  ),
+                ),
+                Expanded(
+                  child: Text(
+                    currentDescParada,
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(Icons.star_border),
+                  onPressed: () {},
+                ),
+              ],
+            ),
+          ),
+        )
+      ],
+    );
+  }
+
+  void updatePanel(BusStop busStop) {
+    currentDescParada = busStop.parada.descParada;
   }
 }
