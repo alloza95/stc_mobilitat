@@ -2,6 +2,7 @@ import 'package:http/http.dart' as http;
 import 'package:stc_mobilitat_app/src/models/bus_stop.dart';
 import 'package:stc_mobilitat_app/src/models/line.dart';
 import 'package:stc_mobilitat_app/src/models/line_route.dart';
+import 'package:stc_mobilitat_app/src/models/nextBus_busStop.dart';
 
 class Services{
 
@@ -19,6 +20,23 @@ class Services{
       }
     } catch (e) {
       return List<BusStop>();
+    }
+  }
+
+  static Future<List<NextBus>> getNextBuses(String id) async {
+    
+    String url = 'https://santqbus.santcugat.cat/consultamv.php?q=GetAllHorariosPrevistos&idparada=$id';
+
+    try {
+      final response = await http.get(url);
+      if (200 == response.statusCode) {
+        final List<NextBus> nextBuses = nextBusFromJson(response.body);
+        return nextBuses;
+      }else{
+        return List<NextBus>();
+      }
+    } catch (e) {
+      return List<NextBus>();
     }
   }
 

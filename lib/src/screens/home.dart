@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:stc_mobilitat_app/src/models/bus_stop.dart';
+import 'package:stc_mobilitat_app/src/models/nextBus_busStop.dart';
 import 'package:stc_mobilitat_app/src/screens/favorites_screen.dart';
 import 'package:stc_mobilitat_app/src/services/favoriteList.dart';
 import 'package:stc_mobilitat_app/src/services/fetch_database.dart';
@@ -37,6 +38,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   String currentDescParada = '';
   Icon _favoriteIcon = Icon(Icons.star_border);
   int favoritesListFlag;
+  List<NextBus> _nextBuses = [];
   //
   
   @override
@@ -304,8 +306,23 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
               ],
             ),
           ),
+        ),
+        //Llista de proxims busos
+        Expanded(
+                  child: ListView.separated(
+            itemCount: _nextBuses.length,
+            separatorBuilder: (context, index) => Divider(color: Colors.black26,),
+            itemBuilder: (context, index) => _listTileNextBus(_nextBuses[index]),
+          ),
         )
       ],
+    );
+  }
+
+  ListTile _listTileNextBus(NextBus nextBus){
+    return ListTile(
+      title: Text(nextBus.nomTrajecte),
+      subtitle: Text(nextBus.horareal),
     );
   }
 
@@ -324,6 +341,16 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
 
   void updatePanel(BusStop busStop) {
     currentDescParada = busStop.parada.descParada;
+    Services.getNextBuses(busStop.idParada.toString()).then((onValue){
+      //Ordenem la llista en funció de la hora
+      onValue.sort((a,b){
+        var adate = a.horareal;
+        var bdate = b.horareal;
+        return adate.compareTo(bdate);
+      });     
+      _nextBuses = onValue;
+      print(_nextBuses.length);
+    });
     if (_isFavorite(busStop.parada)) {
       setState(() {
        _favoriteIcon = Icon(Icons.star); 
