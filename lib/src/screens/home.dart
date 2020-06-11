@@ -33,11 +33,12 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   //Declarem el controlador del panell
   PanelController _panelController;
 
-  //
+  //Dades pel panell
   String currentDescParada = '';
   Icon _favoriteIcon = Icon(Icons.star_border);
   int favoritesListFlag;
   //
+  
   @override
   void initState() {
     super.initState();
@@ -325,12 +326,10 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     currentDescParada = busStop.parada.descParada;
     if (_isFavorite(busStop.parada)) {
       setState(() {
-       print('actualitzo el la icona a favorita');
        _favoriteIcon = Icon(Icons.star); 
       });
     }else{
       setState(() {
-       print('actualitzo la icona a no favorita');
        _favoriteIcon = Icon(Icons.star_border); 
       });
     }
