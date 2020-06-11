@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:stc_mobilitat_app/src/models/bus_stop.dart';
+import 'package:stc_mobilitat_app/src/models/line.dart';
 import 'package:stc_mobilitat_app/src/models/nextBus_busStop.dart';
 import 'package:stc_mobilitat_app/src/screens/favorites_screen.dart';
 import 'package:stc_mobilitat_app/src/services/favoriteList.dart';
 import 'package:stc_mobilitat_app/src/services/fetch_database.dart';
+import 'package:stc_mobilitat_app/src/widgets/line_item.dart';
 import '../widgets/my_drawer.dart';
 import '../services/location.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
@@ -39,8 +41,9 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   Icon _favoriteIcon = Icon(Icons.star_border);
   int favoritesListFlag;
   List<NextBus> _nextBuses = [];
+  List<Line> _linesBusStop = [];
   //
-  
+
   @override
   void initState() {
     super.initState();
@@ -74,6 +77,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             //infoWindow: InfoWindow(title: _parades[i].parada.descParada),
             icon: defaultMarkerIcon,
             onTap: () {
+              _linesBusStop = [];
               //Comportament del panell
               if (_panelController.isPanelClosed != true) {
                 _panelController.close().whenComplete(() {
@@ -287,20 +291,32 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
+                //Llista de Linies de la parada
+                //TODO: Aconseguir centrar la Llista
+                Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: 35,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    separatorBuilder: (context, index) => Container(width: 10,),
+                    itemCount: _linesBusStop.length,
+                    itemBuilder: (context, index) => _lineContainer(_linesBusStop[index]),
+                  ),
+                ),
                 IconButton(
                   icon: _favoriteIcon,
                   onPressed: () {
-                    if(_isFavorite(_parades[markerFlag].parada)){
+                    if (_isFavorite(_parades[markerFlag].parada)) {
                       favoritesList.removeAt(favoritesListFlag);
                       setState(() {
-                       _favoriteIcon = Icon(Icons.star_border); 
+                        _favoriteIcon = Icon(Icons.star_border);
                       });
-                    }else{
+                    } else {
                       favoritesList.add(_parades[markerFlag].parada);
                       setState(() {
-                       _favoriteIcon = Icon(Icons.star); 
+                        _favoriteIcon = Icon(Icons.star);
                       });
-                    }                    
+                    }
                   },
                 ),
               ],
@@ -309,24 +325,45 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
         ),
         //Llista de proxims busos
         Expanded(
-                  child: ListView.separated(
+          child: ListView.separated(
             itemCount: _nextBuses.length,
-            separatorBuilder: (context, index) => Divider(color: Colors.black26,),
-            itemBuilder: (context, index) => _listTileNextBus(_nextBuses[index]),
+            separatorBuilder: (context, index) => Divider(
+              color: Colors.black26,
+            ),
+            itemBuilder: (context, index) =>
+                _listTileNextBus(_nextBuses[index]),
           ),
         )
       ],
     );
   }
 
-  ListTile _listTileNextBus(NextBus nextBus){
+  Widget _lineContainer(Line line) {
+    return Container(
+      width: 50,
+      decoration: BoxDecoration(
+          color: HexColor(line.color),
+          borderRadius: BorderRadius.all(Radius.circular(10))),
+      child: Center(
+        child: Text(
+          line.codLinea,
+          style: TextStyle(
+              color: HexColor(line.textColor),
+              fontSize: 14,
+              fontWeight: FontWeight.bold),
+        ),
+      ),
+    );
+  }
+
+  ListTile _listTileNextBus(NextBus nextBus) {
     return ListTile(
       title: Text(nextBus.nomTrajecte),
       subtitle: Text(nextBus.horareal),
     );
   }
 
-  bool _isFavorite(ParadaClass currentParada){
+  bool _isFavorite(ParadaClass currentParada) {
     bool finalResult = false;
     for (var i = 0; i < favoritesList.length; i++) {
       if (currentParada.idParada == favoritesList[i].idParada) {
@@ -341,23 +378,39 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
 
   void updatePanel(BusStop busStop) {
     currentDescParada = busStop.parada.descParada;
-    Services.getNextBuses(busStop.idParada.toString()).then((onValue){
-      //Ordenem la llista en funció de la hora
-      onValue.sort((a,b){
+    Services.getNextBuses(busStop.idParada.toString()).then((onValue) {
+      //Omplim la llista de Linies, evitant repetits
+      for (var i = 0; i < onValue.length; i++) {
+        bool isPresent = false;
+        for (var x = 0; x < _linesBusStop.length; x++) {
+          if (onValue[i].idLinea == _linesBusStop[x].idLinea) {
+            isPresent = true;
+          }
+        }
+        if (isPresent == false) {
+          setState(() {
+            _linesBusStop.add(onValue[i].linia);
+          });
+        }
+      }
+
+      //Ordenem la llista de proxims busos en funció de la hora
+      onValue.sort((a, b) {
         var adate = a.horareal;
         var bdate = b.horareal;
         return adate.compareTo(bdate);
-      });     
+      });
       _nextBuses = onValue;
       print(_nextBuses.length);
     });
+
     if (_isFavorite(busStop.parada)) {
       setState(() {
-       _favoriteIcon = Icon(Icons.star); 
+        _favoriteIcon = Icon(Icons.star);
       });
-    }else{
+    } else {
       setState(() {
-       _favoriteIcon = Icon(Icons.star_border); 
+        _favoriteIcon = Icon(Icons.star_border);
       });
     }
   }
