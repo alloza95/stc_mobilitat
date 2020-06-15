@@ -1,3 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:stc_mobilitat_app/src/models/bus_stop.dart';
+import 'package:stc_mobilitat_app/src/models/line.dart';
+import 'package:stc_mobilitat_app/src/models/nextBus_busStop.dart';
 
-Icon favoriteIcon = Icon(Icons.star_border);
+List<BusStop> parades = [];
+Icon favoriteIconHomePanel = Icon(Icons.star_border);
+String currentDescParada = '';
+List<NextBus> nextBuses = [];
+List<Line> linesBusStop = [];

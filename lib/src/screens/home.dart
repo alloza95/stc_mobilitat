@@ -2,10 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:stc_mobilitat_app/src/globals/homePanelData.dart';
 import 'package:stc_mobilitat_app/src/models/bus_stop.dart';
-import 'package:stc_mobilitat_app/src/models/line.dart';
-import 'package:stc_mobilitat_app/src/models/nextBus_busStop.dart';
 import 'package:stc_mobilitat_app/src/screens/favorites_screen.dart';
-import 'package:stc_mobilitat_app/src/globals/favoriteList.dart';
 import 'package:stc_mobilitat_app/src/services/fetch_database.dart';
 import 'package:stc_mobilitat_app/src/services/isFavorite.dart';
 import 'package:stc_mobilitat_app/src/widgets/homePanel.dart';
@@ -19,8 +16,6 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
-  //Declarem una llista buida de parades
-  List<BusStop> _parades = [];
   //Declarem una llista buida de marcadors
   List<Marker> _allMarkers = [];
   //Declarem el controlador del mapa
@@ -37,14 +32,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   double marginBottomFab = 0;
   //Declarem el controlador del panell
   PanelController _panelController;
-
-  //Dades pel panell
-  String currentDescParada = '';
-  //Icon _favoriteIcon = Icon(Icons.star_border);
-  //int favoritesListFlag;
-  List<NextBus> _nextBuses = [];
-  List<Line> _linesBusStop = [];
-  //
 
   @override
   void initState() {
@@ -67,27 +54,27 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
 
     Services.getBusStop().then((busStopList) {
       //Omplim la nostre llista amb la resposta
-      _parades = busStopList;
+      parades = busStopList;
 
       setState(() {
-        for (var i = 0; i < _parades.length; i++) {
+        for (var i = 0; i < parades.length; i++) {
           //Creem un marcador
           final marker = Marker(
-            markerId: MarkerId(_parades[i].idParada.toString()),
+            markerId: MarkerId(parades[i].idParada.toString()),
             position:
-                LatLng(_parades[i].parada.latitud, _parades[i].parada.longitud),
+                LatLng(parades[i].parada.latitud, parades[i].parada.longitud),
             //infoWindow: InfoWindow(title: _parades[i].parada.descParada),
             icon: defaultMarkerIcon,
             onTap: () {
-              _linesBusStop = [];
+              linesBusStop = [];
               //Comportament del panell
               if (_panelController.isPanelClosed != true) {
                 _panelController.close().whenComplete(() {
-                  updatePanel(_parades[i]);
+                  updatePanel(parades[i]);
                   _panelController.animatePanelToPosition(0.25);
                 });
               } else {
-                updatePanel(_parades[i]);
+                updatePanel(parades[i]);
                 _panelController.animatePanelToPosition(0.25);
               }
               //Canvi d'icona
@@ -234,17 +221,9 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             ],
           ),
         ),
-        panel: HomePanel(
-          heightScreen: heightScreen,
-          widthScreen: MediaQuery.of(context).size.width,
-          currentDescParada: currentDescParada,
-          linesBusStop: _linesBusStop,
-          parades: _parades,
+        panel: HomePanel(          
           markerFlag: markerFlag,
-          nextBuses: _nextBuses,
-          //favoriteIcon: favoriteIcon,
         ),
-        //_panel(),
         controller: _panelController,
         minHeight: 0,
         maxHeight: heightScreen,
@@ -269,14 +248,14 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       //Omplim la llista de Linies, evitant repetits
       for (var i = 0; i < onValue.length; i++) {
         bool isPresent = false;
-        for (var x = 0; x < _linesBusStop.length; x++) {
-          if (onValue[i].idLinea == _linesBusStop[x].idLinea) {
+        for (var x = 0; x < linesBusStop.length; x++) {
+          if (onValue[i].idLinea == linesBusStop[x].idLinea) {
             isPresent = true;
           }
         }
         if (isPresent == false) {
           setState(() {
-            _linesBusStop.add(onValue[i].linia);
+            linesBusStop.add(onValue[i].linia);
           });
         }
       }
@@ -287,19 +266,17 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
         var bdate = b.horareal;
         return adate.compareTo(bdate);
       });
-      _nextBuses = onValue;
-      print(_nextBuses.length);
+      nextBuses = onValue;
+      print(nextBuses.length);
     });
 
     if (isFavorite(busStop.parada)) {
       setState(() {
-        print('hola aquesta parada es favorite');
-        favoriteIcon = Icon(Icons.star);
+        favoriteIconHomePanel = Icon(Icons.star);
       });
     } else {
       setState(() {
-        print('hola aquesta parada NO es favorite');
-        favoriteIcon = Icon(Icons.star_border);
+        favoriteIconHomePanel = Icon(Icons.star_border);
       });
     }
   }

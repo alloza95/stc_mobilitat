@@ -1,21 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:stc_mobilitat_app/src/globals/homePanelData.dart';
-import 'package:stc_mobilitat_app/src/models/bus_stop.dart';
-import 'package:stc_mobilitat_app/src/models/line.dart';
 import 'package:stc_mobilitat_app/src/models/nextBus_busStop.dart';
 import 'package:stc_mobilitat_app/src/globals/favoriteList.dart';
 import 'package:stc_mobilitat_app/src/services/isFavorite.dart';
 import 'package:stc_mobilitat_app/src/widgets/lineIcon.dart';
 
 class HomePanel extends StatefulWidget {
-  final double heightScreen, widthScreen;
-  final String currentDescParada;
-  final List<Line> linesBusStop;
-  final List<BusStop> parades;
+  //final String currentDescParada;
+  //final List<Line> linesBusStop;
+  //final List<BusStop> parades;
   final int markerFlag;
-  final List<NextBus> nextBuses;
+  //final List<NextBus> nextBuses;
   //final Icon favoriteIcon;
-  HomePanel({this.heightScreen, this.widthScreen, this.currentDescParada, this.linesBusStop, this.parades, this.markerFlag, this.nextBuses});
+  HomePanel({this.markerFlag});
   @override
   _HomePanelState createState() => _HomePanelState();
 }
@@ -31,7 +28,7 @@ class _HomePanelState extends State<HomePanel> {
       children: <Widget>[
         //Header
         Container(
-          height: widget.heightScreen * 0.25,
+          height: MediaQuery.of(context).size.height * 0.25,
           width: double.maxFinite,
           decoration: BoxDecoration(
               boxShadow: [
@@ -60,7 +57,7 @@ class _HomePanelState extends State<HomePanel> {
                 ),
                 Expanded(
                   child: Text(
-                    widget.currentDescParada == null ? '' : widget.currentDescParada,
+                    currentDescParada,
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     textAlign: TextAlign.center,
                     maxLines: 2,
@@ -70,16 +67,16 @@ class _HomePanelState extends State<HomePanel> {
                 //Llista de Linies de la parada
                 //TODO: Aconseguir centrar la Llista
                 Container(
-                  width: widget.widthScreen,
+                  width: MediaQuery.of(context).size.width,
                   height: 35,
                   child: ListView.separated(
                     scrollDirection: Axis.horizontal,
                     separatorBuilder: (context, index) => Container(
                       width: 10,
                     ),
-                    itemCount: widget.linesBusStop.length,
+                    itemCount: linesBusStop.length,
                     itemBuilder: (context, index) => LineIcon(
-                      line: widget.linesBusStop[index],
+                      line: linesBusStop[index],
                       width: 50,
                       height: 35,
                       fontSize: 14,
@@ -87,24 +84,24 @@ class _HomePanelState extends State<HomePanel> {
                   ),
                 ),
                 IconButton(
-                  icon: favoriteIcon,
+                  icon: favoriteIconHomePanel,
                   onPressed: () {
-                    if (isFavorite(widget.parades[widget.markerFlag].parada)) {
+                    if (isFavorite(parades[widget.markerFlag].parada)) {
                       int id;
                       for (var i = 0; i < favoritesList.length; i++) {
-                        if (widget.parades[widget.markerFlag].idParada == favoritesList[i].idParada) {
+                        if (parades[widget.markerFlag].idParada == favoritesList[i].idParada) {
                           id = i;
                           break;
                         }
                       }                      
                       favoritesList.removeAt(id);
                       setState(() {
-                        favoriteIcon = Icon(Icons.star_border);
+                        favoriteIconHomePanel = Icon(Icons.star_border);
                       });
                     } else {
-                      favoritesList.add(widget.parades[widget.markerFlag].parada);
+                      favoritesList.add(parades[widget.markerFlag].parada);
                       setState(() {
-                        favoriteIcon = Icon(Icons.star);
+                        favoriteIconHomePanel = Icon(Icons.star);
                       });
                     }
                   },
@@ -116,32 +113,17 @@ class _HomePanelState extends State<HomePanel> {
         //Llista de proxims busos
         Expanded(
           child: ListView.separated(
-            itemCount: widget.nextBuses.length,
+            itemCount: nextBuses.length,
             separatorBuilder: (context, index) => Divider(
               color: Colors.black26,
             ),
             itemBuilder: (context, index) =>
-                _listTileNextBus(widget.nextBuses[index]),
+                _listTileNextBus(nextBuses[index]),
           ),
         )
       ],
     );
   }
-  //export
-  /*
-  bool _isFavorite(ParadaClass currentParada) {
-    bool finalResult = false;
-    for (var i = 0; i < favoritesList.length; i++) {
-      if (currentParada.idParada == favoritesList[i].idParada) {
-        finalResult = true;
-        favoritesListFlag = i;
-      } else {
-        finalResult = false;
-      }
-    }
-    return finalResult;
-  }
-  */
 
   ListTile _listTileNextBus(NextBus nextBus) {
     String _timeRemaining(int minuts){
