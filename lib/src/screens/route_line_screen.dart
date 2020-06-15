@@ -96,7 +96,7 @@ class _RouteScreenState extends State<RouteScreen> {
                   ? Tab(text: 'Rutes')
                   : Tab(text: 'Ruta ' + (index + 1).toString()),
               pageBuilder: (context, index) => _routesFlag == false
-                  ? Center(child: Text('Ara mateix no hi ha rutes disponibles per la línia ${code}'))
+                  ? Center(child: Text('Ara mateix no hi ha rutes disponibles per la línia $code'))
                   : _tabView(index),
             ),
           ),

@@ -4,7 +4,7 @@ import 'package:stc_mobilitat_app/src/models/bus_stop.dart';
 bool isFavorite(ParadaClass currentParada) {
   bool finalResult = false;
   for (var i = 0; i < favoritesList.length; i++) {
-    if (currentParada.idParada == favoritesList[i].idParada) {
+    if (currentParada.idParada == favoritesList[i].busStop.idParada) {
       finalResult = true;
     }
   }

@@ -1,7 +1,6 @@
 import 'package:stc_mobilitat_app/src/models/bus_stop.dart';
+import 'package:stc_mobilitat_app/src/models/favorite_busStop.dart';
 
 //Llista de parades preferida global
 
-List<ParadaClass> favoritesList = <ParadaClass>[
-  new ParadaClass(descParada: 'parada test'),
-];
+List<FavoriteBusStop> favoritesList = <FavoriteBusStop>[];

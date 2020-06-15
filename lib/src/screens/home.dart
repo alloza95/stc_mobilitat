@@ -155,10 +155,17 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                     border: Border.all(color: Colors.black, width: 1),
                     shape: BoxShape.circle),
                 child: FloatingActionButton(
-                  onPressed: () => Scaffold.of(_context).openDrawer(),
+                  onPressed: () => _panelController.isPanelClosed 
+                    ? Scaffold.of(_context).openDrawer()
+                    : _panelController.close(),
                   backgroundColor: Colors.white,
                   child:
-                      Icon(Icons.menu, size: sizeButton, color: Colors.black),
+                      Icon(
+                        _panelController.isPanelClosed 
+                          ? Icons.menu 
+                          : Icons.arrow_back, 
+                        size: sizeButton, 
+                        color: Colors.black),
                   heroTag: 'menu',
                 ),
               ),

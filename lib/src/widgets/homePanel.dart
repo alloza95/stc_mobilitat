@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stc_mobilitat_app/src/globals/homePanelData.dart';
+import 'package:stc_mobilitat_app/src/models/favorite_busStop.dart';
 import 'package:stc_mobilitat_app/src/models/nextBus_busStop.dart';
 import 'package:stc_mobilitat_app/src/globals/favoriteList.dart';
 import 'package:stc_mobilitat_app/src/services/isFavorite.dart';
@@ -89,7 +90,7 @@ class _HomePanelState extends State<HomePanel> {
                     if (isFavorite(parades[widget.markerFlag].parada)) {
                       int id;
                       for (var i = 0; i < favoritesList.length; i++) {
-                        if (parades[widget.markerFlag].idParada == favoritesList[i].idParada) {
+                        if (parades[widget.markerFlag].idParada == favoritesList[i].busStop.idParada) {
                           id = i;
                           break;
                         }
@@ -99,7 +100,8 @@ class _HomePanelState extends State<HomePanel> {
                         favoriteIconHomePanel = Icon(Icons.star_border);
                       });
                     } else {
-                      favoritesList.add(parades[widget.markerFlag].parada);
+                      FavoriteBusStop newFavoriteBusStop = new FavoriteBusStop(busStop: parades[widget.markerFlag].parada, linesBusStop: linesBusStop);
+                      favoritesList.add(newFavoriteBusStop);
                       setState(() {
                         favoriteIconHomePanel = Icon(Icons.star);
                       });
