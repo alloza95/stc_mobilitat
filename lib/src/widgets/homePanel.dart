@@ -3,7 +3,8 @@ import 'package:stc_mobilitat_app/src/globals/homePanelData.dart';
 import 'package:stc_mobilitat_app/src/models/bus_stop.dart';
 import 'package:stc_mobilitat_app/src/models/line.dart';
 import 'package:stc_mobilitat_app/src/models/nextBus_busStop.dart';
-import 'package:stc_mobilitat_app/src/services/favoriteList.dart';
+import 'package:stc_mobilitat_app/src/globals/favoriteList.dart';
+import 'package:stc_mobilitat_app/src/services/isFavorite.dart';
 import 'package:stc_mobilitat_app/src/widgets/lineIcon.dart';
 
 class HomePanel extends StatefulWidget {
@@ -21,7 +22,7 @@ class HomePanel extends StatefulWidget {
 
 class _HomePanelState extends State<HomePanel> {
   //Icon _favoriteIcon = widget.favoriteIcon;
-  int favoritesListFlag;
+  //int favoritesListFlag;
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -88,8 +89,15 @@ class _HomePanelState extends State<HomePanel> {
                 IconButton(
                   icon: favoriteIcon,
                   onPressed: () {
-                    if (_isFavorite(widget.parades[widget.markerFlag].parada)) {
-                      favoritesList.removeAt(favoritesListFlag);
+                    if (isFavorite(widget.parades[widget.markerFlag].parada)) {
+                      int id;
+                      for (var i = 0; i < favoritesList.length; i++) {
+                        if (widget.parades[widget.markerFlag].idParada == favoritesList[i].idParada) {
+                          id = i;
+                          break;
+                        }
+                      }                      
+                      favoritesList.removeAt(id);
                       setState(() {
                         favoriteIcon = Icon(Icons.star_border);
                       });
@@ -119,7 +127,8 @@ class _HomePanelState extends State<HomePanel> {
       ],
     );
   }
-
+  //export
+  /*
   bool _isFavorite(ParadaClass currentParada) {
     bool finalResult = false;
     for (var i = 0; i < favoritesList.length; i++) {
@@ -132,6 +141,7 @@ class _HomePanelState extends State<HomePanel> {
     }
     return finalResult;
   }
+  */
 
   ListTile _listTileNextBus(NextBus nextBus) {
     String _timeRemaining(int minuts){

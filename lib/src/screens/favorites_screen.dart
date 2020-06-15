@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stc_mobilitat_app/src/models/bus_stop.dart';
-import 'package:stc_mobilitat_app/src/services/favoriteList.dart';
+import 'package:stc_mobilitat_app/src/globals/favoriteList.dart';
 
 class FavoritesList extends StatefulWidget {
   static String routeName = '/favoritesList';

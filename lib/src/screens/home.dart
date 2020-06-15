@@ -5,10 +5,10 @@ import 'package:stc_mobilitat_app/src/models/bus_stop.dart';
 import 'package:stc_mobilitat_app/src/models/line.dart';
 import 'package:stc_mobilitat_app/src/models/nextBus_busStop.dart';
 import 'package:stc_mobilitat_app/src/screens/favorites_screen.dart';
-import 'package:stc_mobilitat_app/src/services/favoriteList.dart';
+import 'package:stc_mobilitat_app/src/globals/favoriteList.dart';
 import 'package:stc_mobilitat_app/src/services/fetch_database.dart';
+import 'package:stc_mobilitat_app/src/services/isFavorite.dart';
 import 'package:stc_mobilitat_app/src/widgets/homePanel.dart';
-import 'package:stc_mobilitat_app/src/widgets/lineIcon.dart';
 import '../widgets/my_drawer.dart';
 import '../services/location.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
@@ -41,7 +41,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   //Dades pel panell
   String currentDescParada = '';
   //Icon _favoriteIcon = Icon(Icons.star_border);
-  int favoritesListFlag;
+  //int favoritesListFlag;
   List<NextBus> _nextBuses = [];
   List<Line> _linesBusStop = [];
   //
@@ -262,19 +262,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       drawer: getDrawer(context),
     );
   }
-
-  bool _isFavorite(ParadaClass currentParada) {
-    bool finalResult = false;
-    for (var i = 0; i < favoritesList.length; i++) {
-      if (currentParada.idParada == favoritesList[i].idParada) {
-        finalResult = true;
-        favoritesListFlag = i;
-      } else {
-        finalResult = false;
-      }
-    }
-    return finalResult;
-  }
   
   void updatePanel(BusStop busStop) {
     currentDescParada = busStop.parada.descParada;
@@ -304,12 +291,14 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       print(_nextBuses.length);
     });
 
-    if (_isFavorite(busStop.parada)) {
+    if (isFavorite(busStop.parada)) {
       setState(() {
+        print('hola aquesta parada es favorite');
         favoriteIcon = Icon(Icons.star);
       });
     } else {
       setState(() {
+        print('hola aquesta parada NO es favorite');
         favoriteIcon = Icon(Icons.star_border);
       });
     }
