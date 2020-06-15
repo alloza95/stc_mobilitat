@@ -179,18 +179,21 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               //Botó per anar a la pantalla "parades preferides"
-              Container(
-                margin: EdgeInsets.only(bottom: marginBottomFab),
-                decoration: BoxDecoration(
-                    border: Border.all(color: Colors.green, width: 1),
-                    shape: BoxShape.circle),
-                child: FloatingActionButton(
-                  onPressed: () =>
-                      Navigator.pushNamed(context, FavoritesList.routeName),
-                  backgroundColor: Colors.white,
-                  child:
-                      Icon(Icons.star, size: sizeButton, color: Colors.green),
-                  heroTag: 'favorites',
+              Visibility(
+                visible: _panelController.isPanelClosed ? true : false,
+                child: Container(
+                  margin: EdgeInsets.only(bottom: marginBottomFab),
+                  decoration: BoxDecoration(
+                      border: Border.all(color: Colors.green, width: 1),
+                      shape: BoxShape.circle),
+                  child: FloatingActionButton(
+                    onPressed: () =>
+                        Navigator.pushNamed(context, FavoritesList.routeName),
+                    backgroundColor: Colors.white,
+                    child:
+                        Icon(Icons.star, size: sizeButton, color: Colors.green),
+                    heroTag: 'favorites',
+                  ),
                 ),
               ),
               //Botó per geolocalitzar l'usuari
@@ -298,9 +301,12 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                   height: 35,
                   child: ListView.separated(
                     scrollDirection: Axis.horizontal,
-                    separatorBuilder: (context, index) => Container(width: 10,),
+                    separatorBuilder: (context, index) => Container(
+                      width: 10,
+                    ),
                     itemCount: _linesBusStop.length,
-                    itemBuilder: (context, index) => _lineContainer(_linesBusStop[index]),
+                    itemBuilder: (context, index) =>
+                        _lineContainer(_linesBusStop[index]),
                   ),
                 ),
                 IconButton(
