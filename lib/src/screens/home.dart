@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:stc_mobilitat_app/src/globals/homePanelData.dart';
 import 'package:stc_mobilitat_app/src/models/bus_stop.dart';
 import 'package:stc_mobilitat_app/src/models/line.dart';
 import 'package:stc_mobilitat_app/src/models/nextBus_busStop.dart';
 import 'package:stc_mobilitat_app/src/screens/favorites_screen.dart';
 import 'package:stc_mobilitat_app/src/services/favoriteList.dart';
 import 'package:stc_mobilitat_app/src/services/fetch_database.dart';
+import 'package:stc_mobilitat_app/src/widgets/homePanel.dart';
 import 'package:stc_mobilitat_app/src/widgets/lineIcon.dart';
 import '../widgets/my_drawer.dart';
 import '../services/location.dart';
@@ -38,7 +40,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
 
   //Dades pel panell
   String currentDescParada = '';
-  Icon _favoriteIcon = Icon(Icons.star_border);
+  //Icon _favoriteIcon = Icon(Icons.star_border);
   int favoritesListFlag;
   List<NextBus> _nextBuses = [];
   List<Line> _linesBusStop = [];
@@ -232,7 +234,17 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             ],
           ),
         ),
-        panel: _panel(),
+        panel: HomePanel(
+          heightScreen: heightScreen,
+          widthScreen: MediaQuery.of(context).size.width,
+          currentDescParada: currentDescParada,
+          linesBusStop: _linesBusStop,
+          parades: _parades,
+          markerFlag: markerFlag,
+          nextBuses: _nextBuses,
+          //favoriteIcon: favoriteIcon,
+        ),
+        //_panel(),
         controller: _panelController,
         minHeight: 0,
         maxHeight: heightScreen,
@@ -251,134 +263,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     );
   }
 
-  Widget _panel() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: <Widget>[
-        //Header
-        Container(
-          height: heightScreen * 0.25,
-          width: double.maxFinite,
-          decoration: BoxDecoration(
-              boxShadow: [
-                BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 3,
-                    spreadRadius: 1,
-                    offset: Offset(0, 3))
-              ],
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(32), topRight: Radius.circular(32))),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                Container(
-                  margin: EdgeInsets.only(bottom: 16),
-                  height: 4,
-                  width: 64,
-                  decoration: BoxDecoration(
-                    color: Colors.black12,
-                    borderRadius: BorderRadius.all(Radius.circular(4)),
-                  ),
-                ),
-                Expanded(
-                  child: Text(
-                    currentDescParada,
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.center,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                //Llista de Linies de la parada
-                //TODO: Aconseguir centrar la Llista
-                Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: 35,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    separatorBuilder: (context, index) => Container(
-                      width: 10,
-                    ),
-                    itemCount: _linesBusStop.length,
-                    itemBuilder: (context, index) => LineIcon(
-                      line: _linesBusStop[index],
-                      width: 50,
-                      height: 35,
-                      fontSize: 14,
-                    )
-                  ),
-                ),
-                IconButton(
-                  icon: _favoriteIcon,
-                  onPressed: () {
-                    if (_isFavorite(_parades[markerFlag].parada)) {
-                      favoritesList.removeAt(favoritesListFlag);
-                      setState(() {
-                        _favoriteIcon = Icon(Icons.star_border);
-                      });
-                    } else {
-                      favoritesList.add(_parades[markerFlag].parada);
-                      setState(() {
-                        _favoriteIcon = Icon(Icons.star);
-                      });
-                    }
-                  },
-                ),
-              ],
-            ),
-          ),
-        ),
-        //Llista de proxims busos
-        Expanded(
-          child: ListView.separated(
-            itemCount: _nextBuses.length,
-            separatorBuilder: (context, index) => Divider(
-              color: Colors.black26,
-            ),
-            itemBuilder: (context, index) =>
-                _listTileNextBus(_nextBuses[index]),
-          ),
-        )
-      ],
-    );
-  }
-
-  ListTile _listTileNextBus(NextBus nextBus) {
-    String _timeRemaining(int minuts){
-      String resultat = '';
-      if (minuts == 0 || minuts == 1) {
-        resultat = 'Imminent';
-      }else if(minuts/60 > 1){
-        double hora = minuts/60;
-        if (hora.truncate() == 1) {
-          resultat = '1 hora';
-        }else{
-          resultat = hora.truncate().toString() + ' hores';
-        }
-      }else{
-        resultat = minuts.toString() + ' min';
-      }
-      return resultat;
-    }
-    return ListTile(
-      leading: LineIcon(
-        line: nextBus.linia,
-        width: 50,
-        height: 35,
-        fontSize: 14,
-      ),
-      //_lineIcon(nextBus.linia, 50.0, 35.0),
-      title: Text(nextBus.nomTrajecte),
-      subtitle: Text(nextBus.horareal),
-      trailing: Text(_timeRemaining(nextBus.faltenminuts)),
-    );
-  }
-
   bool _isFavorite(ParadaClass currentParada) {
     bool finalResult = false;
     for (var i = 0; i < favoritesList.length; i++) {
@@ -391,7 +275,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     }
     return finalResult;
   }
-
+  
   void updatePanel(BusStop busStop) {
     currentDescParada = busStop.parada.descParada;
     Services.getNextBuses(busStop.idParada.toString()).then((onValue) {
@@ -422,11 +306,11 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
 
     if (_isFavorite(busStop.parada)) {
       setState(() {
-        _favoriteIcon = Icon(Icons.star);
+        favoriteIcon = Icon(Icons.star);
       });
     } else {
       setState(() {
-        _favoriteIcon = Icon(Icons.star_border);
+        favoriteIcon = Icon(Icons.star_border);
       });
     }
   }
