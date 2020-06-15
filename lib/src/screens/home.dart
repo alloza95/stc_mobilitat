@@ -307,7 +307,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                     ),
                     itemCount: _linesBusStop.length,
                     itemBuilder: (context, index) =>
-                        _lineContainer(_linesBusStop[index], 50.0),
+                        _lineContainer(_linesBusStop[index], 50.0, 35.0),
                   ),
                 ),
                 IconButton(
@@ -345,9 +345,10 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     );
   }
 
-  Widget _lineContainer(Line line, double width) {
+  Widget _lineContainer(Line line, double width, double height) {
     return Container(
       width: width,
+      height: height,
       decoration: BoxDecoration(
           color: HexColor(line.color),
           borderRadius: BorderRadius.all(Radius.circular(10))),
@@ -370,7 +371,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
         resultat = 'Imminent';
       }else if(minuts/60 > 1){
         double hora = minuts/60;
-        print(hora.truncate());
         if (hora.truncate() == 1) {
           resultat = '1 hora';
         }else{
@@ -379,13 +379,11 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       }else{
         resultat = minuts.toString() + ' min';
       }
-      double residu = minuts/60;
-      print('$minuts. Residu: $residu');
       return resultat;
     }
     return ListTile(
       //TODO: posar la icona de la linia corresponent
-      leading: Icon(CustomIcon.bus),
+      leading: _lineContainer(nextBus.linia, 50.0, 35.0),
       title: Text(nextBus.nomTrajecte),
       subtitle: Text(nextBus.horareal),
       trailing: Text(_timeRemaining(nextBus.faltenminuts)),
