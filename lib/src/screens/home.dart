@@ -6,6 +6,7 @@ import 'package:stc_mobilitat_app/src/models/nextBus_busStop.dart';
 import 'package:stc_mobilitat_app/src/screens/favorites_screen.dart';
 import 'package:stc_mobilitat_app/src/services/favoriteList.dart';
 import 'package:stc_mobilitat_app/src/services/fetch_database.dart';
+import 'package:stc_mobilitat_app/src/styles/icons/custom_icon_icons.dart';
 import 'package:stc_mobilitat_app/src/widgets/line_item.dart';
 import '../widgets/my_drawer.dart';
 import '../services/location.dart';
@@ -306,7 +307,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                     ),
                     itemCount: _linesBusStop.length,
                     itemBuilder: (context, index) =>
-                        _lineContainer(_linesBusStop[index]),
+                        _lineContainer(_linesBusStop[index], 50.0),
                   ),
                 ),
                 IconButton(
@@ -344,9 +345,9 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     );
   }
 
-  Widget _lineContainer(Line line) {
+  Widget _lineContainer(Line line, double width) {
     return Container(
-      width: 50,
+      width: width,
       decoration: BoxDecoration(
           color: HexColor(line.color),
           borderRadius: BorderRadius.all(Radius.circular(10))),
@@ -363,9 +364,31 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   }
 
   ListTile _listTileNextBus(NextBus nextBus) {
+    String _timeRemaining(int minuts){
+      String resultat = '';
+      if (minuts == 0 || minuts == 1) {
+        resultat = 'Imminent';
+      }else if(minuts/60 > 1){
+        double hora = minuts/60;
+        print(hora.truncate());
+        if (hora.truncate() == 1) {
+          resultat = '1 hora';
+        }else{
+          resultat = hora.truncate().toString() + ' hores';
+        }
+      }else{
+        resultat = minuts.toString() + ' min';
+      }
+      double residu = minuts/60;
+      print('$minuts. Residu: $residu');
+      return resultat;
+    }
     return ListTile(
+      //TODO: posar la icona de la linia corresponent
+      leading: Icon(CustomIcon.bus),
       title: Text(nextBus.nomTrajecte),
       subtitle: Text(nextBus.horareal),
+      trailing: Text(_timeRemaining(nextBus.faltenminuts)),
     );
   }
 
