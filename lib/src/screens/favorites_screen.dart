@@ -16,22 +16,26 @@ class _FavoritesListState extends State<FavoritesList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        key: _scaffoldKey,
-        appBar: AppBar(
-          title: Text('Parades preferides'),
-        ),
-        body: ListView.separated(
-            separatorBuilder: (context, index) => Divider(
-                  color: Colors.black26,
-                ),
-            itemCount: favoritesList.length,
-            itemBuilder: (context, index) => _listTile(context, favoritesList[index], index)));
+      key: _scaffoldKey,
+      appBar: AppBar(
+        title: Text('Parades preferides'),
+      ),
+      body: favoritesList.isEmpty
+        ? Center(child: Text('Actualment no tens parades preferides', style: TextStyle(fontSize: 16),))
+        : ListView.separated(
+          separatorBuilder: (context, index) => Divider(
+                color: Colors.black26,
+              ),
+          itemCount: favoritesList.length,
+          itemBuilder: (context, index) => _listTile(context, favoritesList[index], index)
+        )
+    );
   }
 
   ListTile _listTile(BuildContext context, FavoriteBusStop favoriteBusStop, int index) {
     return ListTile(
       title: Text(favoriteBusStop.busStop.descParada),
-      subtitle: Container(
+      subtitle: favoriteBusStop.linesBusStop.isEmpty ? Text('Ara mateix no hi han línies disponibles') : Container(
         width: MediaQuery.of(context).size.width,
         height: 25,
         child: ListView.separated(

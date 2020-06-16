@@ -6,21 +6,14 @@ import 'package:stc_mobilitat_app/src/globals/favoriteList.dart';
 import 'package:stc_mobilitat_app/src/services/isFavorite.dart';
 import 'package:stc_mobilitat_app/src/widgets/lineIcon.dart';
 
-class HomePanel extends StatefulWidget {
-  //final String currentDescParada;
-  //final List<Line> linesBusStop;
-  //final List<BusStop> parades;
-  final int markerFlag;
-  //final List<NextBus> nextBuses;
-  //final Icon favoriteIcon;
+class HomePanel extends StatefulWidget {  
+  final int markerFlag;  
   HomePanel({this.markerFlag});
   @override
   _HomePanelState createState() => _HomePanelState();
 }
 
-class _HomePanelState extends State<HomePanel> {
-  //Icon _favoriteIcon = widget.favoriteIcon;
-  //int favoritesListFlag;
+class _HomePanelState extends State<HomePanel> {  
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -67,7 +60,7 @@ class _HomePanelState extends State<HomePanel> {
                 ),
                 //Llista de Linies de la parada
                 //TODO: Aconseguir centrar la Llista
-                Container(
+                linesBusStop.isEmpty ? Center(child: Text('Ara mateix no hi han línies disponibles'),) : Container(
                   width: MediaQuery.of(context).size.width,
                   height: 35,
                   child: ListView.separated(
@@ -113,7 +106,7 @@ class _HomePanelState extends State<HomePanel> {
           ),
         ),
         //Llista de proxims busos
-        Expanded(
+        nextBuses.isEmpty ? Expanded(child: Center(child: Text('No hi han sortides previstes en els pròxims 90 minuts'))) : Expanded(
           child: ListView.separated(
             itemCount: nextBuses.length,
             separatorBuilder: (context, index) => Divider(

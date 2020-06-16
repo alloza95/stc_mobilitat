@@ -9,6 +9,7 @@ import 'package:stc_mobilitat_app/src/widgets/homePanel.dart';
 import '../widgets/my_drawer.dart';
 import '../services/location.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 class Home extends StatefulWidget {
   @override
@@ -27,18 +28,21 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   int markerFlag;
   //Guarda l'altura total de la pantalla del dispositiu
   double heightScreen;
+  double widthScreen;
   //Bandera que controla el marge inferior que han
   //de tenir els dos botons inferiors
   double marginBottomFab = 0;
-  //Declarem el controlador del panell
-  PanelController _panelController;
+  //Declatem la variable del estil del mapa
+  String _mapStyle;
 
   @override
   void initState() {
     super.initState();
+    rootBundle.loadString('assets/map_style.txt').then((onValue){
+      _mapStyle = onValue;
+    });
     //Es crea el controlador del panell
-    _panelController = new PanelController();
-
+    panelController = new PanelController();
     //Es crea l'icona del marcador per defecte
     BitmapDescriptor.fromAssetImage(ImageConfiguration(size: Size(40, 40)),
             'assets/default_busStop_icon.png')
@@ -68,14 +72,14 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             onTap: () {
               linesBusStop = [];
               //Comportament del panell
-              if (_panelController.isPanelClosed != true) {
-                _panelController.close().whenComplete(() {
+              if (panelController.isPanelClosed != true) {
+                panelController.close().whenComplete(() {
                   updatePanel(parades[i]);
-                  _panelController.animatePanelToPosition(0.25);
+                  panelController.animatePanelToPosition(0.25);
                 });
               } else {
                 updatePanel(parades[i]);
-                _panelController.animatePanelToPosition(0.25);
+                panelController.animatePanelToPosition(0.25);
               }
               //Canvi d'icona
               if (markerFlag != i) {
@@ -115,6 +119,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     return GoogleMap(
       onMapCreated: (GoogleMapController controller) {
         _mapController = controller;
+        _mapController.setMapStyle(_mapStyle);
       },
       initialCameraPosition: CameraPosition(
         target: bloc.coordenades,
@@ -155,13 +160,13 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                     border: Border.all(color: Colors.black, width: 1),
                     shape: BoxShape.circle),
                 child: FloatingActionButton(
-                  onPressed: () => _panelController.isPanelClosed 
+                  onPressed: () => panelController.isPanelClosed 
                     ? Scaffold.of(_context).openDrawer()
-                    : _panelController.close(),
+                    : panelController.close(),
                   backgroundColor: Colors.white,
                   child:
                       Icon(
-                        _panelController.isPanelClosed 
+                        panelController.isPanelClosed 
                           ? Icons.menu 
                           : Icons.arrow_back, 
                         size: sizeButton, 
@@ -176,7 +181,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             children: <Widget>[
               //Botó per anar a la pantalla "parades preferides"
               Visibility(
-                visible: _panelController.isPanelClosed ? true : false,
+                visible: panelController.isPanelClosed ? true : false,
                 child: Container(
                   margin: EdgeInsets.only(bottom: marginBottomFab),
                   decoration: BoxDecoration(
@@ -217,6 +222,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     //Obtenim l'altura de la pantalla
     heightScreen = MediaQuery.of(context).size.height;
+    widthScreen = MediaQuery.of(context).size.width;
 
     return Scaffold(
       body: SlidingUpPanel(
@@ -231,7 +237,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
         panel: HomePanel(          
           markerFlag: markerFlag,
         ),
-        controller: _panelController,
+        controller: panelController,
         minHeight: 0,
         maxHeight: heightScreen,
         snapPoint: 0.5,
