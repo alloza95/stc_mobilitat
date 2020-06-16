@@ -20,7 +20,7 @@ class LineItem extends StatelessWidget {
         title: Text(line.descLinea),
         onTap: () {
           print('apreto la línia ' + line.codLinea);
-          Navigator.pushNamed(context, RouteScreen.routeName, arguments: RouteScreen(codeLine: line.codLinea, idLine: line.idLinea,));
+          Navigator.pushNamed(context, RouteScreen.routeName, arguments: RouteScreen(codeLine: line.codLinea, idLine: line.idLinea, descLine: line.descLinea,));
         },
       ),
     );

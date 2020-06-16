@@ -9,7 +9,8 @@ import 'package:stc_mobilitat_app/src/widgets/custom_tab_view.dart';
 class RouteScreen extends StatefulWidget {
   final String codeLine;
   final int idLine;
-  RouteScreen({this.codeLine, this.idLine});
+  final String descLine;
+  RouteScreen({this.codeLine, this.idLine, this.descLine});
 
   static String routeName = '/route';
   @override
@@ -19,10 +20,14 @@ class RouteScreen extends StatefulWidget {
 class _RouteScreenState extends State<RouteScreen> {
   RouteScreen args;
   String code = '';
+  String descLine = '';
   //Declarem una llista buida d'objectes LineRoute
-  List<LineRoute> _routes = [];
+ 
+  List<Parada> _finalRoute = [];
+  List<Marker> _allMarkers = [];
+  BitmapDescriptor defaultMarkerIcon;
 
-  List<Polyline> _allPolylines = [];
+  
 
   bool _routesFlag = true;
 
@@ -32,18 +37,61 @@ class _RouteScreenState extends State<RouteScreen> {
   @override
   void initState() {
     super.initState();
+    BitmapDescriptor.fromAssetImage(ImageConfiguration(size: Size(40, 40)),
+            'assets/default_busStop_icon.png')
+        .then((onValue) {
+      defaultMarkerIcon = onValue;
+    });
     Future.delayed(Duration.zero, () {
       setState(() {
         args = ModalRoute.of(context).settings.arguments;
         code = args.codeLine;
+        descLine = args.descLine;
       });
       print('Estic al initState. Code: ' + args.codeLine);
       Services.getRoutes(args.idLine.toString()).then((routes) {
+        
+        //Omplim la llista de parades
+        for (var i = 0; i < routes.length; i++) {
+          if (i == 0) {
+            for (var x = 0; x < routes[i].trayectosDet.length; x++){
+              _finalRoute.add(routes[i].trayectosDet[x].parada);
+            }
+          }else{
+            if (routes[i].trayectosDet.first.idParada == routes[i-1].trayectosDet.last.idParada){
+              _finalRoute.removeLast();
+              for (var x = 0; x < routes[i].trayectosDet.length; x++){
+                _finalRoute.add(routes[i].trayectosDet[x].parada);
+              }
+            } 
+          }                              
+        }
+
+        //Omplim la llista de Markers
+        List<Marker> _provisionalList = [];
+        for (var i = 0; i < _finalRoute.length; i++) {
+          bool _exist = false;
+          for( var x = 0; x < _provisionalList.length; x++){
+            if (_provisionalList[x].markerId.toString() == _finalRoute[i].idParada.toString()) {
+              _exist = true;
+            }
+          }
+          if (!_exist) {
+            final marker = Marker(
+              markerId: MarkerId(_finalRoute[i].idParada.toString()),
+              position: LatLng(_finalRoute[i].latitud, _finalRoute[i].longitud),
+              infoWindow: InfoWindow(title: _finalRoute[i].descParada),
+              icon: defaultMarkerIcon
+            );
+            _provisionalList.add(marker);
+          }
+        }
+
         setState(() {
-          _routes = routes;
-          if (_routes.isEmpty) {
+          if (_finalRoute.isEmpty) {
             _routesFlag = false;
           }
+          _allMarkers = _provisionalList;
         });
       });
     });
@@ -63,7 +111,8 @@ class _RouteScreenState extends State<RouteScreen> {
       zoomControlsEnabled: false,
       myLocationEnabled: bloc.locationEnabled,
       myLocationButtonEnabled: false,
-      polylines: Set.from(_allPolylines),
+      markers: Set.from(_allMarkers),
+      //polylines: Set.from(_allPolylines),
       /*markers: Set.from(_allMarkers),
       onTap: (value){
         if (markerFlag != null) {
@@ -91,7 +140,7 @@ class _RouteScreenState extends State<RouteScreen> {
           ),
           Expanded(
             child: CustomTabView(
-              itemCount: _routesFlag == false ? 1 : _routes.length,
+              itemCount: 1,
               tabBuilder: (context, index) => _routesFlag == false
                   ? Tab(text: 'Rutes')
                   : Tab(text: 'Ruta ' + (index + 1).toString()),
@@ -121,17 +170,16 @@ class _RouteScreenState extends State<RouteScreen> {
             )]
           ),
           padding: EdgeInsets.all(15),
-          child: Center(child: Text(_routes[i].descTrayecto))
+          child: Center(child: Text(descLine))
         ),
         Expanded(
           child: ListView.separated(
               separatorBuilder: (context, index) => Divider(),
-              itemCount: _routes[i].trayectosDet == null
+              itemCount: _finalRoute == null
                   ? 0
-                  : _routes[i].trayectosDet.length,
+                  : _finalRoute.length,
               itemBuilder: (context, index) {
-                String nomParada =
-                    _routes[i].trayectosDet[index].parada.descParada;
+                String nomParada = _finalRoute[index].descParada;
                 return ListTile(
                   leading: Icon(CustomIcon.bus),
                   title: Text(nomParada),

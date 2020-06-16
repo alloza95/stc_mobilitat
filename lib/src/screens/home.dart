@@ -38,7 +38,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    rootBundle.loadString('assets/map_style.txt').then((onValue){
+    rootBundle.loadString('assets/map_style.txt').then((onValue) {
       _mapStyle = onValue;
     });
     //Es crea el controlador del panell
@@ -160,17 +160,16 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                     border: Border.all(color: Colors.black, width: 1),
                     shape: BoxShape.circle),
                 child: FloatingActionButton(
-                  onPressed: () => panelController.isPanelClosed 
-                    ? Scaffold.of(_context).openDrawer()
-                    : panelController.close(),
+                  onPressed: () => panelController.isPanelClosed
+                      ? Scaffold.of(_context).openDrawer()
+                      : panelController.close(),
                   backgroundColor: Colors.white,
-                  child:
-                      Icon(
-                        panelController.isPanelClosed 
-                          ? Icons.menu 
-                          : Icons.arrow_back, 
-                        size: sizeButton, 
-                        color: Colors.black),
+                  child: Icon(
+                      panelController.isPanelClosed
+                          ? Icons.menu
+                          : Icons.arrow_back,
+                      size: sizeButton,
+                      color: Colors.black),
                   heroTag: 'menu',
                 ),
               ),
@@ -227,14 +226,16 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     return Scaffold(
       body: SlidingUpPanel(
         body: Builder(
-          builder: (context) => Stack(
-            children: <Widget>[
-              _googleMap(),
-              SafeArea(child: _botons(context)),
-            ],
+          builder: (context) => SafeArea(
+            child: Stack(
+              children: <Widget>[
+                _googleMap(),
+                _botons(context),
+              ],
+            ),
           ),
         ),
-        panel: HomePanel(          
+        panel: HomePanel(
           markerFlag: markerFlag,
         ),
         controller: panelController,
@@ -254,7 +255,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       drawer: getDrawer(context),
     );
   }
-  
+
   void updatePanel(BusStop busStop) {
     currentDescParada = busStop.parada.descParada;
     Services.getNextBuses(busStop.idParada.toString()).then((onValue) {

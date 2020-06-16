@@ -12,6 +12,7 @@ class Lines extends StatefulWidget {
 
 class _LinesState extends State<Lines> {
   List<Line> _lines = <Line>[];
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -20,6 +21,7 @@ class _LinesState extends State<Lines> {
       .then((lines) {
         setState(() {
           _lines = lines;
+          isLoading = false;
         });
       }
     );
@@ -28,15 +30,18 @@ class _LinesState extends State<Lines> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text('Línies'),
+      appBar: AppBar(
+        title: Text('Línies'),
+      ),
+      body: isLoading 
+        ? Center(child: CircularProgressIndicator())
+        : ListView.separated(
+        separatorBuilder: (context, index) => Divider(
+          color: Colors.black26,
         ),
-        body: ListView.separated(
-          separatorBuilder: (context, index) => Divider(
-            color: Colors.black26,
-          ),
-          itemCount: _lines.length,
-          itemBuilder: (context, index) => LineItem(line: _lines[index]),
-        ));
+        itemCount: _lines.length,
+        itemBuilder: (context, index) => LineItem(line: _lines[index]),
+      )
+    );
   }
 }
