@@ -7,7 +7,7 @@
     <application
         android:name="io.flutter.app.FlutterApplication"
         android:label="stc_mobilitat_app"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_app_custom">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
