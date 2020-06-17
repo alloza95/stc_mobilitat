@@ -26,6 +26,7 @@ class _RouteScreenState extends State<RouteScreen> {
   BitmapDescriptor defaultMarkerIcon;
   String _mapStyle;
   GoogleMapController _mapController;
+  bool _isLoading = true;
 
 
   //El següent codi s'executa quan s'inicia l'estat
@@ -100,12 +101,11 @@ class _RouteScreenState extends State<RouteScreen> {
         }
         setState(() {
           _allMarkers = _provisionalList;
+          _isLoading = false;
         });
       });
     });
   }
-
-
 
   //Retorna el mapa de GoogleMaps
   GoogleMap _googleMap() {
@@ -191,40 +191,44 @@ class _RouteScreenState extends State<RouteScreen> {
                     child: Text(descLine),
                   ),
                 ),
-                _finalRoute.isEmpty 
-                  ? Expanded(
-                    child: Center(
-                      child: Text('Ara mateix no hi ha rutes disponibles per la lñinia $code')
-                    )
-                  )
-                  : Expanded(
-                    child: ListView.separated(
-                      itemCount: _finalRoute.length,
-                      itemBuilder: (context, index) => ListTile(
-                        title: Text(_finalRoute[index].descParada, 
-                          style: _finalRoute[index].idZona == 0 
-                            ? TextStyle(fontSize: 14)
-                            : TextStyle(fontSize: 16, fontWeight: FontWeight.bold)), 
-                        leading: Icon(CustomIcon.bus),
-                        onTap: (){
-                          LatLng _coordenades = LatLng(_finalRoute[index].latitud, _finalRoute[index].longitud);
-                          setState(() {
-                            _mapController.animateCamera(
-                              CameraUpdate.newCameraPosition(
-                                CameraPosition(target: _coordenades, zoom: 16.8)
-                              )
-                            );
-                          });
-                        },
-                      ),
-                      separatorBuilder: (context, index) => Divider(),
-                    )
-                  )
+                _isLoading ? Center(child: CircularProgressIndicator()) : _listContent()                
               ],
             ),
           )
         ],
       ),
     );
+  }
+
+  Widget _listContent(){
+    return _finalRoute.isEmpty 
+      ? Expanded(
+        child: Center(
+          child: Text('Ara mateix no hi ha rutes disponibles per la línia $code')
+        )
+      )
+      : Expanded(
+        child: ListView.separated(
+          itemCount: _finalRoute.length,
+          itemBuilder: (context, index) => ListTile(
+            title: Text(_finalRoute[index].descParada, 
+              style: _finalRoute[index].idZona == 0 
+                ? TextStyle(fontSize: 14)
+                : TextStyle(fontSize: 16, fontWeight: FontWeight.bold)), 
+            leading: Icon(CustomIcon.bus),
+            onTap: (){
+              LatLng _coordenades = LatLng(_finalRoute[index].latitud, _finalRoute[index].longitud);
+              setState(() {
+                _mapController.animateCamera(
+                  CameraUpdate.newCameraPosition(
+                    CameraPosition(target: _coordenades, zoom: 16.8)
+                  )
+                );
+              });
+            },
+          ),
+          separatorBuilder: (context, index) => Divider(),
+        )
+      );
   }
 }
