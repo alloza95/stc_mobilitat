@@ -4,7 +4,7 @@ import 'package:stc_mobilitat_app/src/models/line_route.dart';
 import 'package:stc_mobilitat_app/src/services/fetch_database.dart';
 import 'package:stc_mobilitat_app/src/services/location.dart';
 import 'package:stc_mobilitat_app/src/styles/icons/custom_icon_icons.dart';
-import 'package:stc_mobilitat_app/src/widgets/custom_tab_view.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 class RouteScreen extends StatefulWidget {
   final String codeLine;
@@ -21,22 +21,20 @@ class _RouteScreenState extends State<RouteScreen> {
   RouteScreen args;
   String code = '';
   String descLine = '';
-  //Declarem una llista buida d'objectes LineRoute
- 
   List<Parada> _finalRoute = [];
   List<Marker> _allMarkers = [];
   BitmapDescriptor defaultMarkerIcon;
-
-  
-
-  bool _routesFlag = true;
-
+  String _mapStyle;
   GoogleMapController _mapController;
+
 
   //El següent codi s'executa quan s'inicia l'estat
   @override
   void initState() {
     super.initState();
+    rootBundle.loadString('assets/map_style.txt').then((onValue) {
+      _mapStyle = onValue;
+    });
     BitmapDescriptor.fromAssetImage(ImageConfiguration(size: Size(40, 40)),
             'assets/default_busStop_icon.png')
         .then((onValue) {
@@ -48,19 +46,33 @@ class _RouteScreenState extends State<RouteScreen> {
         code = args.codeLine;
         descLine = args.descLine;
       });
-      print('Estic al initState. Code: ' + args.codeLine);
       Services.getRoutes(args.idLine.toString()).then((routes) {
         
         //Omplim la llista de parades
         for (var i = 0; i < routes.length; i++) {
-          if (i == 0) {
-            for (var x = 0; x < routes[i].trayectosDet.length; x++){
+          int total = routes[i].trayectosDet.length - 1;
+          if (i == 0) {            
+            for (var x = 0; x < routes[i].trayectosDet.length; x++){              
+              if (x == 0) {
+                routes[i].trayectosDet[x].parada.idZona = 1;
+              } else if (x == total){
+                routes[i].trayectosDet[x].parada.idZona = 1;
+              }else{
+                routes[i].trayectosDet[x].parada.idZona = 0;
+              }
               _finalRoute.add(routes[i].trayectosDet[x].parada);
             }
           }else{
             if (routes[i].trayectosDet.first.idParada == routes[i-1].trayectosDet.last.idParada){
               _finalRoute.removeLast();
               for (var x = 0; x < routes[i].trayectosDet.length; x++){
+                if (x == 0) {
+                  routes[i].trayectosDet[x].parada.idZona = 1;
+                } else if (x == total){
+                  routes[i].trayectosDet[x].parada.idZona = 1;
+                }else{
+                  routes[i].trayectosDet[x].parada.idZona = 0;
+                }
                 _finalRoute.add(routes[i].trayectosDet[x].parada);
               }
             } 
@@ -86,22 +98,21 @@ class _RouteScreenState extends State<RouteScreen> {
             _provisionalList.add(marker);
           }
         }
-
         setState(() {
-          if (_finalRoute.isEmpty) {
-            _routesFlag = false;
-          }
           _allMarkers = _provisionalList;
         });
       });
     });
   }
 
+
+
   //Retorna el mapa de GoogleMaps
   GoogleMap _googleMap() {
     return GoogleMap(
       onMapCreated: (GoogleMapController controller) {
         _mapController = controller;
+        controller.setMapStyle(_mapStyle);
       },
       initialCameraPosition: CameraPosition(
         target: bloc.coordenades,
@@ -112,17 +123,33 @@ class _RouteScreenState extends State<RouteScreen> {
       myLocationEnabled: bloc.locationEnabled,
       myLocationButtonEnabled: false,
       markers: Set.from(_allMarkers),
-      //polylines: Set.from(_allPolylines),
-      /*markers: Set.from(_allMarkers),
-      onTap: (value){
-        if (markerFlag != null) {
-          setState(() {
-            _allMarkers[markerFlag] = _allMarkers[markerFlag].copyWith(iconParam: defaultMarkerIcon);
-            markerFlag = null;
-          });
-        }
-      },*/
     );
+  }
+
+  Widget _geoButton(){
+    return Container(
+      decoration: BoxDecoration(
+          border: Border.all(color: Colors.green, width: 1),
+          shape: BoxShape.circle),
+      child: FloatingActionButton(
+        onPressed: () => {_getLocation()},
+        backgroundColor: Colors.white,
+        child: Icon(Icons.my_location,
+            size: 36.0, color: Colors.green),
+        heroTag: 'location',
+      ),
+    );
+  }
+
+  //Pregunta a l'usuari si dona permís per utilitzar l'ubicació,
+  //i en cas afirmatiu, el centra en el mapa.
+  void _getLocation() {
+    bloc.getMyLocation().then((coordenades) {
+      setState(() {
+        _mapController.animateCamera(CameraUpdate.newCameraPosition(
+            CameraPosition(target: coordenades, zoom: 16.8)));
+      });
+    });
   }
 
   //El widget que retornem
@@ -136,57 +163,68 @@ class _RouteScreenState extends State<RouteScreen> {
         children: <Widget>[
           Container(
             height: MediaQuery.of(context).size.height / 3,
-            child: _googleMap(),
-          ),
-          Expanded(
-            child: CustomTabView(
-              itemCount: 1,
-              tabBuilder: (context, index) => _routesFlag == false
-                  ? Tab(text: 'Rutes')
-                  : Tab(text: 'Ruta ' + (index + 1).toString()),
-              pageBuilder: (context, index) => _routesFlag == false
-                  ? Center(child: Text('Ara mateix no hi ha rutes disponibles per la línia $code'))
-                  : _tabView(index),
+            child: Stack(
+              children: [
+                _googleMap(),
+                Positioned(
+                  bottom: 16,
+                  right: 16,
+                  child: _geoButton()
+                )
+              ]
             ),
           ),
+          Expanded(
+            child: Column(
+              children: <Widget>[
+                Container(
+                  height: 50,
+                  decoration: BoxDecoration(
+                    boxShadow: [BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 1,
+                      blurRadius: 5
+                    )],
+                    color: Theme.of(context).primaryColor
+                  ),
+                  child: Center(
+                    child: Text(descLine),
+                  ),
+                ),
+                _finalRoute.isEmpty 
+                  ? Expanded(
+                    child: Center(
+                      child: Text('Ara mateix no hi ha rutes disponibles per la lñinia $code')
+                    )
+                  )
+                  : Expanded(
+                    child: ListView.separated(
+                      itemCount: _finalRoute.length,
+                      itemBuilder: (context, index) => ListTile(
+                        title: Text(_finalRoute[index].descParada, 
+                          style: _finalRoute[index].idZona == 0 
+                            ? TextStyle(fontSize: 14)
+                            : TextStyle(fontSize: 16, fontWeight: FontWeight.bold)), 
+                        leading: Icon(CustomIcon.bus),
+                        onTap: (){
+                          LatLng _coordenades = LatLng(_finalRoute[index].latitud, _finalRoute[index].longitud);
+                          setState(() {
+                            _mapController.animateCamera(
+                              CameraUpdate.newCameraPosition(
+                                CameraPosition(target: _coordenades, zoom: 16.8)
+                              )
+                            );
+                          });
+                        },
+                      ),
+                      separatorBuilder: (context, index) => Divider(),
+                    )
+                  )
+              ],
+            ),
+          )
         ],
       ),
-    );
-  }
-
-  //Funció per crear una llista de parades a cada pageView
-  _tabView(int i) {
-    return Column(
-      //crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Container(
-          width: MediaQuery.of(context).size.width,
-          decoration: BoxDecoration(
-            color: Theme.of(context).primaryColor,
-            boxShadow: [BoxShadow(
-              color: Colors.grey.withOpacity(0.5),
-              spreadRadius: 1,
-              blurRadius: 5
-            )]
-          ),
-          padding: EdgeInsets.all(15),
-          child: Center(child: Text(descLine))
-        ),
-        Expanded(
-          child: ListView.separated(
-              separatorBuilder: (context, index) => Divider(),
-              itemCount: _finalRoute == null
-                  ? 0
-                  : _finalRoute.length,
-              itemBuilder: (context, index) {
-                String nomParada = _finalRoute[index].descParada;
-                return ListTile(
-                  leading: Icon(CustomIcon.bus),
-                  title: Text(nomParada),
-                );
-              }),
-        ),
-      ],
     );
   }
 }
