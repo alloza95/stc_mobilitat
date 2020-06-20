@@ -187,8 +187,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                       border: Border.all(color: Colors.green, width: 1),
                       shape: BoxShape.circle),
                   child: FloatingActionButton(
-                    onPressed: () =>
-                        Navigator.pushNamed(context, FavoritesList.routeName),
+                    onPressed: () => Navigator.pushNamed(context, FavoritesList.routeName),
                     backgroundColor: Colors.white,
                     child:
                         Icon(Icons.star, size: sizeButton, color: Colors.green),

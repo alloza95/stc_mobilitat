@@ -6,7 +6,7 @@
 
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="stc_mobilitat_app"
+        android:label="StC Mobilitat"
         android:icon="@mipmap/ic_app_custom">
         <activity
             android:name=".MainActivity"
