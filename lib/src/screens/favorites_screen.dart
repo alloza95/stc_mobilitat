@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:stc_mobilitat_app/src/globals/favoriteList.dart';
 import 'package:stc_mobilitat_app/src/models/favorite_busStop.dart';
+import 'package:stc_mobilitat_app/src/services/fetch_database.dart';
+import 'package:stc_mobilitat_app/src/styles/icons/custom_icon_icons.dart';
 import 'package:stc_mobilitat_app/src/widgets/lineIcon.dart';
 
 class FavoritesList extends StatefulWidget {
@@ -12,6 +14,29 @@ class FavoritesList extends StatefulWidget {
 
 class _FavoritesListState extends State<FavoritesList> {
   GlobalKey _scaffoldKey = GlobalKey<ScaffoldState>();
+  @override
+  void initState() {
+    for (var i = 0; i < favoritesList.length; i++) {
+      favoritesList[i].nextBuses = [];
+      Services.getNextBuses(favoritesList[i].busStop.idParada.toString()).then((res){
+        //Ordenem la llista de proxims busos en funció de la hora
+        res.sort((a, b) {
+          var adate = a.horareal;
+          var bdate = b.horareal;
+          return adate.compareTo(bdate);
+        });
+
+        for (var x = 0; x < res.length; x++) {
+          if(x < 3){
+            setState(() {
+             favoritesList[i].nextBuses.add(res[x]); 
+            });
+          }
+        }        
+      });
+    }
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,8 +60,23 @@ class _FavoritesListState extends State<FavoritesList> {
                     _listTile(context, favoritesList[index], index)));
   }
   //TODO: Quan cliques una parada hauries d'anar a la Home i tenir la parada oberta i localitzada
-  Widget _listTile(
-      BuildContext context, FavoriteBusStop favoriteBusStop, int index) {
+  Widget _listTile(BuildContext context, FavoriteBusStop favoriteBusStop, int index) {
+    String _timeRemaining(int minuts){
+      String resultat = '';
+      if (minuts == 0 || minuts == 1) {
+        resultat = 'Imminent';
+      }else if(minuts/60 > 1){
+        double hora = minuts/60;
+        if (hora.truncate() == 1) {
+          resultat = '1 hora';
+        }else{
+          resultat = hora.truncate().toString() + ' hores';
+        }
+      }else{
+        resultat = minuts.toString() + ' min';
+      }
+      return resultat;
+    }
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       height: 70,
@@ -50,25 +90,41 @@ class _FavoritesListState extends State<FavoritesList> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(favoriteBusStop.busStop.descParada),
-              favoriteBusStop.linesBusStop.isEmpty
+              favoriteBusStop.nextBuses.isEmpty
                   ? Text('Ara mateix no hi han línies disponibles')
-                  : Container(
-                      margin: EdgeInsets.only(top: 8),
-                      width: MediaQuery.of(context).size.width * 0.75,
-                      height: 25,
-                      child: ListView.separated(
+                  : Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        Container(
+                          margin: EdgeInsets.only(right: 5),
+                          child: Icon(CustomIcon.bus)),
+                        Container(
+                        width: MediaQuery.of(context).size.width * 0.7,
+                        height: 25,
+                        child: ListView.separated(
                           scrollDirection: Axis.horizontal,
-                          separatorBuilder: (context, index) => Container(
-                                width: 10,
+                          itemCount: favoriteBusStop.nextBuses.length,
+                          separatorBuilder: (context, index) => Container(width: 10),
+                          itemBuilder: (context, index) => Row(
+                            children: <Widget>[
+                              Padding(
+                                padding: const EdgeInsets.only(right: 5),
+                                child: LineIcon(
+                                  line: favoriteBusStop.nextBuses[index].linia,
+                                  width: 40,
+                                  height: 25,
+                                  fontSize: 14,
+                                ),
                               ),
-                          itemCount: favoriteBusStop.linesBusStop.length,
-                          itemBuilder: (context, index) => LineIcon(
-                                line: favoriteBusStop.linesBusStop[index],
-                                width: 50,
-                                height: 25,
-                                fontSize: 14,
-                              )),
-                    )
+                              Text(_timeRemaining(favoriteBusStop.nextBuses[index].faltenminuts))
+                            ],
+                          ),
+                        ),
+                      )
+                    ],),
+                  )
             ],
           ),
           Column(

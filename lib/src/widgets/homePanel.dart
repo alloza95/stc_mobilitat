@@ -96,7 +96,7 @@ class _HomePanelState extends State<HomePanel> {
                         favoriteIconHomePanel = Icon(Icons.star_border);
                       });
                     } else {
-                      FavoriteBusStop newFavoriteBusStop = new FavoriteBusStop(busStop: parades[widget.markerFlag].parada, linesBusStop: linesBusStop);
+                      FavoriteBusStop newFavoriteBusStop = new FavoriteBusStop(busStop: parades[widget.markerFlag].parada, nextBuses: []);
                       favoritesList.add(newFavoriteBusStop);
                       setState(() {
                         favoriteIconHomePanel = Icon(Icons.star);
