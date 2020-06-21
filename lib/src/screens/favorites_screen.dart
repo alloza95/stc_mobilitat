@@ -79,7 +79,7 @@ class _FavoritesListState extends State<FavoritesList> {
     }
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      height: 70,
+      height: 90,
       width: MediaQuery.of(context).size.width,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -89,7 +89,10 @@ class _FavoritesListState extends State<FavoritesList> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text(favoriteBusStop.busStop.descParada),
+              Container(
+                //color: Colors.red,
+                width: MediaQuery.of(context).size.width * 0.75,
+                child: Text(favoriteBusStop.busStop.descParada, maxLines: 2)),
               favoriteBusStop.nextBuses.isEmpty
                   ? Text('Ara mateix no hi han línies disponibles')
                   : Padding(
@@ -101,7 +104,7 @@ class _FavoritesListState extends State<FavoritesList> {
                           margin: EdgeInsets.only(right: 5),
                           child: Icon(CustomIcon.bus)),
                         Container(
-                        width: MediaQuery.of(context).size.width * 0.7,
+                        width: MediaQuery.of(context).size.width * 0.65,
                         height: 25,
                         child: ListView.separated(
                           scrollDirection: Axis.horizontal,
