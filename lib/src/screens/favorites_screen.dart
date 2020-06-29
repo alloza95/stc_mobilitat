@@ -14,11 +14,14 @@ class FavoritesList extends StatefulWidget {
 
 class _FavoritesListState extends State<FavoritesList> {
   GlobalKey _scaffoldKey = GlobalKey<ScaffoldState>();
+  bool _isLoading = true;
+
   @override
   void initState() {
     for (var i = 0; i < favoritesList.length; i++) {
       favoritesList[i].nextBuses = [];
-      Services.getNextBuses(favoritesList[i].busStop.idParada.toString()).then((res){
+      Services.getNextBuses(favoritesList[i].busStop.idParada.toString())
+          .then((res) {
         //Ordenem la llista de proxims busos en funció de la hora
         res.sort((a, b) {
           var adate = a.horareal;
@@ -27,12 +30,13 @@ class _FavoritesListState extends State<FavoritesList> {
         });
 
         for (var x = 0; x < res.length; x++) {
-          if(x < 3){
+          if (x < 3) {
             setState(() {
-             favoritesList[i].nextBuses.add(res[x]); 
+              favoritesList[i].nextBuses.add(res[x]);
+              _isLoading = false;
             });
           }
-        }        
+        }
       });
     }
     super.initState();
@@ -59,27 +63,58 @@ class _FavoritesListState extends State<FavoritesList> {
                 itemBuilder: (context, index) =>
                     _listTile(context, favoritesList[index], index)));
   }
-  //TODO: Quan cliques una parada hauries d'anar a la Home i tenir la parada oberta i localitzada
+
   Widget _listTile(BuildContext context, FavoriteBusStop favoriteBusStop, int index) {
-    String _timeRemaining(int minuts){
-      String resultat = '';
-      if (minuts == 0 || minuts == 1) {
-        resultat = 'Imminent';
-      }else if(minuts/60 > 1){
-        double hora = minuts/60;
-        if (hora.truncate() == 1) {
-          resultat = '1 hora';
-        }else{
-          resultat = hora.truncate().toString() + ' hores';
-        }
-      }else{
-        resultat = minuts.toString() + ' min';
-      }
-      return resultat;
+    Widget _createNextBusesList() {
+      return favoriteBusStop.nextBuses.isEmpty
+          ? Text('Ara mateix no hi han línies disponibles')
+          : Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Container(
+                      margin: EdgeInsets.only(right: 15),
+                      child: Icon(CustomIcon.bus)),
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.65,
+                    height: 55,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: favoriteBusStop.nextBuses.length,
+                      separatorBuilder: (context, index) => Container(width: 0),
+                      itemBuilder: (context, index) => Container(
+                        width: 75,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: <Widget>[
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 5),
+                              child: LineIcon(
+                                line: favoriteBusStop.nextBuses[index].linia,
+                                width: 40,
+                                height: 25,
+                                fontSize: 14,
+                              ),
+                            ),
+                            Text(
+                                _timeRemaining(favoriteBusStop
+                                    .nextBuses[index].faltenminuts),
+                                textAlign: TextAlign.center)
+                          ],
+                        ),
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            );
     }
+
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      height: 90,
+      height: 100,
       width: MediaQuery.of(context).size.width,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -90,44 +125,18 @@ class _FavoritesListState extends State<FavoritesList> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Container(
-                //color: Colors.red,
-                width: MediaQuery.of(context).size.width * 0.75,
-                child: Text(favoriteBusStop.busStop.descParada, maxLines: 2)),
-              favoriteBusStop.nextBuses.isEmpty
-                  ? Text('Ara mateix no hi han línies disponibles')
-                  : Padding(
-                    padding: const EdgeInsets.only(top: 8),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        Container(
-                          margin: EdgeInsets.only(right: 5),
-                          child: Icon(CustomIcon.bus)),
-                        Container(
-                        width: MediaQuery.of(context).size.width * 0.65,
-                        height: 25,
-                        child: ListView.separated(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: favoriteBusStop.nextBuses.length,
-                          separatorBuilder: (context, index) => Container(width: 10),
-                          itemBuilder: (context, index) => Row(
-                            children: <Widget>[
-                              Padding(
-                                padding: const EdgeInsets.only(right: 5),
-                                child: LineIcon(
-                                  line: favoriteBusStop.nextBuses[index].linia,
-                                  width: 40,
-                                  height: 25,
-                                  fontSize: 14,
-                                ),
-                              ),
-                              Text(_timeRemaining(favoriteBusStop.nextBuses[index].faltenminuts))
-                            ],
-                          ),
-                        ),
-                      )
-                    ],),
-                  )
+                  //color: Colors.red,
+                  width: MediaQuery.of(context).size.width * 0.75,
+                  child: Text(
+                    favoriteBusStop.busStop.descParada,
+                    maxLines: 2,
+                    style: TextStyle(fontSize: 16),
+                  )),
+              _isLoading
+                  ? Center(
+                      child: CircularProgressIndicator(),
+                    )
+                  : _createNextBusesList()
             ],
           ),
           Column(
@@ -173,5 +182,22 @@ class _FavoritesListState extends State<FavoritesList> {
         ],
       ),
     );
+  }
+
+  String _timeRemaining(int minuts) {
+    String resultat = '';
+    if (minuts == 0 || minuts == 1) {
+      resultat = 'Imminent';
+    } else if (minuts / 60 > 1) {
+      double hora = minuts / 60;
+      if (hora.truncate() == 1) {
+        resultat = '1 hora';
+      } else {
+        resultat = hora.truncate().toString() + ' hores';
+      }
+    } else {
+      resultat = minuts.toString() + ' min';
+    }
+    return resultat;
   }
 }
