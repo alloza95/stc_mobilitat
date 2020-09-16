@@ -1,16 +1,17 @@
-# stc_mobilitat_app
+# StC Mobilitat App
 
-A new Flutter project.
+Final project of Multimedia Degree. I designed and developed with agile methodologies a mobility app for the public transport (bus) of Sant Cugat del Vallès. It was developed with Flutter using Visual Studio and data was fetched through HTTP requests.
 
-## Getting Started
+The final mark of project was 9.1/10.
 
-This project is a starting point for a Flutter application.
 
-A few resources to get you started if this is your first Flutter project:
+### Home
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### Favorites Bus Stops
+
+
+### Bus Lines
+
+
+### Tickets and prices
