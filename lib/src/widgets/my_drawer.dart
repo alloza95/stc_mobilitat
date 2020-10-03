@@ -38,11 +38,11 @@ Drawer getDrawer(BuildContext context) {
     return ListView(
       children: <Widget>[
         _header(),
-        _getItem(CustomIcon.star, 'Parades preferides', FavoritesList.routeName),
+        _getItem(CustomIcon.star, 'Parades preferides', 'favorites'),
          Divider(),
-        _getItem(CustomIcon.bus, 'Línies i parades', Lines.routeName),
+        _getItem(CustomIcon.bus, 'Línies i parades', 'lines'),
          Divider(),
-        _getItem(CustomIcon.money, 'Títols i tarifes', TitlesPrices.routeName)
+        _getItem(CustomIcon.money, 'Títols i tarifes', 'titles_prices')
       ],
     );
   }

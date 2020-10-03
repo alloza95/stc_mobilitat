@@ -21,7 +21,7 @@ class LineItem extends StatelessWidget {
         onTap: () {
           Navigator.pushNamed(
             context, 
-            RouteScreen.routeName, 
+            'routes', 
             arguments: RouteScreen(
               codeLine: line.codLinea, 
               idLine: line.idLinea, 

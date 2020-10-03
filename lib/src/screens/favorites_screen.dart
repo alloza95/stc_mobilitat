@@ -114,7 +114,7 @@ class _FavoritesListState extends State<FavoritesList> {
 
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      height: 100,
+      height: 120,
       width: MediaQuery.of(context).size.width,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,

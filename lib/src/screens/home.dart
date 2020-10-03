@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:stc_mobilitat_app/src/globals/homePanelData.dart';
 import 'package:stc_mobilitat_app/src/models/bus_stop.dart';
-import 'package:stc_mobilitat_app/src/screens/favorites_screen.dart';
 import 'package:stc_mobilitat_app/src/services/fetch_database.dart';
 import 'package:stc_mobilitat_app/src/services/isFavorite.dart';
 import 'package:stc_mobilitat_app/src/widgets/homePanel.dart';
@@ -187,7 +186,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                       border: Border.all(color: Colors.green, width: 1),
                       shape: BoxShape.circle),
                   child: FloatingActionButton(
-                    onPressed: () => Navigator.pushNamed(context, FavoritesList.routeName),
+                    onPressed: () => Navigator.pushNamed(context, 'favorites'),
                     backgroundColor: Colors.white,
                     child:
                         Icon(Icons.star, size: sizeButton, color: Colors.green),

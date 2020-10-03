@@ -32,6 +32,7 @@ dependencies:
   location: ^3.0.0
   http: ^0.12.1
   sliding_up_panel: ^1.0.2
+  flutter_bloc: ^6.0.5
 
 dev_dependencies:
   flutter_test:
