@@ -13,8 +13,6 @@ class LocationBloc extends Bloc<LocationEvent, MyLocationState> {
 
   Location _location = Location();
 
-  Stream<LocationData> _positionSubscription;
-
   void checkGpsAndLocation() {
     
     this._location.hasPermission().then(( permission ){
