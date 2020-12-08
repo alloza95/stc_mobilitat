@@ -14,29 +14,25 @@ import 'package:stc_mobilitat_app/src/screens/titles_prices_screen.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider( create: ( _ ) => LocationBloc() ),
-        BlocProvider( create:  ( _ ) => MapBloc() )
+        BlocProvider(create: (_) => LocationBloc()),
+        BlocProvider(create: (_) => MapBloc())
       ],
       child: MaterialApp(
         title: 'StC Mobilitat',
         initialRoute: 'home_prov',
         routes: {
-          'home'         : ( _ ) => Home(),
-          'home_prov'    : ( _ ) => HomeProvisional(),
-          'favorites'    : ( _ ) => FavoritesList(),
-          'lines'        : ( _ ) => Lines(),
-          'titles_prices': ( _ ) => TitlesPrices(),
-          'routes'       : ( _ ) => RouteScreen()
+          'home': (_) => Home(),
+          'home_prov': (_) => HomeProvisional(),
+          'favorites': (_) => FavoritesList(),
+          'lines': (_) => Lines(),
+          'titles_prices': (_) => TitlesPrices(),
+          'routes': (_) => RouteScreen()
         },
-        theme: ThemeData(
-          primaryColor: Colors.white,
-          accentColor: Colors.green
-        ),
+        theme: ThemeData(primaryColor: Colors.white, accentColor: Colors.green),
       ),
     );
   }

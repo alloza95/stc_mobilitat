@@ -3,6 +3,10 @@ part of 'map_bloc.dart';
 @immutable
 abstract class MapEvent {}
 
+class OnReadyPanel extends MapEvent {}
+
+class OnClosePanel extends MapEvent {}
+
 class OnReadyMap extends MapEvent {}
 
 class OnReadyMarkers extends MapEvent {}
